@@ -20,6 +20,7 @@ public:
 	void Update(void);
 	void Draw(void);
 
+	RECT GetTextureRect(IDirect3DTexture9* pSceneTexture);
 	LPDIRECT3DDEVICE9 GetDevice(void){return m_pD3DDevice;}
 	D3DPRESENT_PARAMETERS GetD3D(void) { return m_pD3Dpa; }
 
@@ -28,8 +29,13 @@ private:
 	D3DPRESENT_PARAMETERS m_pD3Dpa;
 	LPDIRECT3DDEVICE9 m_pD3DDevice;			//direct3Dデバイスへのポインタ
 	LPD3DXEFFECT pEffect;
+	LPD3DXEFFECT pEffectdot;
+	LPD3DXEFFECT pEffectDownSample;
+	LPD3DXEFFECT pEffectBrightCheck;
+	LPD3DXEFFECT pEffectLinear;
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff;		//頂点バッファ
 	LPDIRECT3DTEXTURE9 pSceneTexture;
+	LPDIRECT3DTEXTURE9 pBloomTexture;
 };
 
 #endif // ! _RENDERER_H_

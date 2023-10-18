@@ -23,6 +23,8 @@
 #include "objectX.h"
 #include "enemy.h"
 
+#include "map.h"
+
 CFade * CScene::m_pFade = NULL;
 //=============================================
 //コンストラクタ
@@ -37,7 +39,7 @@ CScene::CScene()
 //=============================================
 CScene::~CScene()
 {
-	CManager::SetLightCount(0);
+	CManager::GetInstance()->SetLightCount(0);
 }
 //=============================================
 //生成関数
@@ -94,7 +96,8 @@ HRESULT CTitle::Init()
 	CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH /2, SCREEN_HEIGHT/2, 0.0f),SCREEN_HEIGHT,SCREEN_WIDTH,0, "data\\TEXTURE\\TITLE\\lab1.png");
 	m_pTitle = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f), 305.0f, 600.0f, 0, "data\\TEXTURE\\TITLE\\lab2.png");
 	m_posDest = D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f);
-	CSound * pSound = CManager::GetSound();
+	CSound * pSound = CManager::GetInstance()->GetSound();
+
 	//pSound->Play(CSound::SOUND_LABEL_BGM000);
 	return S_OK;
 }
@@ -112,14 +115,14 @@ void CTitle::Update()
 {
 	
 	m_pTitle->SetPos(m_pTitle->GetPos() + (m_posDest - m_pTitle->GetPos()) / 120);
-	if (CManager::GetDistance((m_pTitle->GetPos() - m_posDest)) <= 10.0f)
+	if (CManager::GetInstance()->GetDistance((m_pTitle->GetPos() - m_posDest)) <= 10.0f)
 	{
 		m_posDest = D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f);
 	
 		m_posDest.x += rand() % 100 - 50;
 	}
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
-	CInputGamePad * pInputGamepad = CManager::GetInputGamePad();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
+	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	if (pInputKeyboard->GetTrigger(DIK_RETURN)|| pInputGamepad->GetTrigger(CInputGamePad::Button_START,0))
 	{
 		m_pFade->FadeOut(MODE::MODE_GAME);
@@ -155,7 +158,7 @@ HRESULT CTutorial::Init()
 	m_pFade = DBG_NEW CFade;
 	m_pFade->Init();
 
-	CSound * pSound = CManager::GetSound();
+	CSound * pSound = CManager::GetInstance()->GetSound();
 
 	return S_OK;
 }
@@ -209,7 +212,7 @@ HRESULT CGame::Init()
 	m_pLight = DBG_NEW CLight;
 	m_pPlayer = CPlayer::Create();
 	CEnemy_Walker::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 10);
-	CObjectX::Create("data\\MODEL\\floor.x", D3DXVECTOR3(0.0f, -1000.0f, 0.0f));
+	CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", m_pPlayer);
 	//初期化設定;
 	
 	if (FAILED(m_pCamera->Init()))
@@ -224,7 +227,7 @@ HRESULT CGame::Init()
 	
 
 
-	CSound * pSound = CManager::GetSound();
+	CSound * pSound = CManager::GetInstance()->GetSound();
 	//pSound->Play(CSound::SOUND_LABEL_BGM001);
 
 
@@ -260,23 +263,23 @@ void CGame::Uninit()
 //=============================================
 void CGame::Update()
 {
-	CDebugProc * pDeb = CManager::GetDeb();
+	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 	m_nCnt++;
 
 	m_pCamera->Update();
 	m_pLight->Update();
 
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
-	CInputGamePad * pInputGamepad = CManager::GetInputGamePad();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
+	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	if (pInputKeyboard->GetTrigger(DIK_P) || pInputGamepad->GetTrigger(CInputGamePad::Button_START,0))
 	{
-		if (CManager::GetPause())
+		if (CManager::GetInstance()->GetPause())
 		{
-			CManager::SetPause(false);
+			CManager::GetInstance()->SetPause(false);
 		}
 		else
 		{
-			CManager::SetPause(true);
+			CManager::GetInstance()->SetPause(true);
 		}
 	}
 
@@ -364,8 +367,8 @@ void CResult::Uninit()
 void CResult::Update()
 {
 
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
-	CInputGamePad * pInputGamepad = CManager::GetInputGamePad();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
+	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	if (pInputKeyboard->GetTrigger(DIK_RETURN)|| pInputGamepad->GetTrigger(CInputGamePad::Button_START, 0))
 	{
 		m_pFade->FadeOut(MODE::MODE_TITLE);

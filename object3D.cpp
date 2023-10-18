@@ -39,7 +39,7 @@ CObject3D::~CObject3D()
 HRESULT CObject3D::Init(void)
 {
 
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
@@ -130,7 +130,7 @@ void CObject3D::Uninit(void)
 //=============================================
 void CObject3D::Update(void)
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 
 
@@ -205,7 +205,7 @@ void CObject3D::Update(void)
 //=============================================
 void CObject3D::Draw(void)
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリクス

@@ -40,7 +40,7 @@ CEffect::~CEffect()
 //=============================================
 HRESULT CEffect::Init(char * pName)
 {
-	CTexture * pTex = CManager::GetTexture();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
 
 	m_nIdxTex[0] = pTex->Regist(pName);
 	CBillboard::Init();
@@ -96,7 +96,7 @@ void CEffect::Update()
 //=============================================
 void CEffect::Draw()
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	//アルファテストを有効化

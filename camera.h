@@ -30,6 +30,7 @@ public:
 	void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
 	D3DXVECTOR3 GetVec(void) { return m_vecCamera; }
 	D3DXVECTOR3 GetPosV(void) { return m_posV; }
+	D3DXVECTOR3 GetPosR(void) { return m_posR; }
 private:
 	D3DXVECTOR3 m_posV;			//éãì_
 	D3DXVECTOR3 m_posR;			//íçéãì_

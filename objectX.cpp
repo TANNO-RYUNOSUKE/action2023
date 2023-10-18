@@ -21,7 +21,7 @@
 CObjectX::CObjectX(int nPriority) : CObject(nPriority)
 {
 
-	CXManager * pManger = CManager::GetXManager();
+	CXManager * pManger = CManager::GetInstance()->GetXManager();
 	pManger->Regist(this);
 	m_pVtxBuff = NULL;
 	m_vtxMaxModel = D3DXVECTOR3(-1000.0f, -1000.0f, -1000.0f);
@@ -47,13 +47,13 @@ HRESULT CObjectX::Init()
 	int nNumVtx = 0; //頂点数
 	DWORD dwSizeFVF; //頂点フォーマットのサイズ
 	BYTE*pVtxBuff = NULL; //頂点バッファへのポインタ
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
 
-	CTexture * pTex = CManager::GetTexture();
-	CXFile * pXFile = CManager::GetXFiles();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
+	CXFile * pXFile = CManager::GetInstance()->GetXFiles();
 	m_nIdxXFile = pXFile->Regist(m_pModelName);
 
 
@@ -96,6 +96,12 @@ HRESULT CObjectX::Init()
 
 		pVtxBuff += dwSizeFVF;
 	}
+	m_vtxMinModel.x -= 10.0f;
+	m_vtxMinModel.y -= 10.0f;
+	m_vtxMinModel.z -= 10.0f;
+	m_vtxMaxModel.x += 10.0f;
+	m_vtxMaxModel.y += 10.0f;
+	m_vtxMaxModel.z += 10.0f;
 	//頂点バッファをアンロック
 	pXFile->GetAddress(m_nIdxXFile)->UnlockVertexBuffer();
 
@@ -135,7 +141,7 @@ CObjectX * CObjectX::Create(char * pName, D3DXVECTOR3 pos, D3DXVECTOR3 rot, int 
 //=============================================
 void CObjectX::Uninit(void)
 {
-	CXManager * pManger = CManager::GetXManager();
+	CXManager * pManger = CManager::GetInstance()->GetXManager();
 	if (m_nID >= 0)
 	{
 		pManger->Release(m_nID);
@@ -155,7 +161,7 @@ void CObjectX::Uninit(void)
 //=============================================
 void CObjectX::Update(void)
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 }
@@ -165,9 +171,9 @@ void CObjectX::Update(void)
 //=============================================
 void CObjectX::Draw(void)
 {
-	CXFile * pXFile = CManager::GetXFiles();
-	CTexture * pTex = CManager::GetTexture();
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CXFile * pXFile = CManager::GetInstance()->GetXFiles();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリクス
@@ -225,7 +231,7 @@ void CObjectX::Draw(void)
 bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement,bool * pLand)
 {
 	
-	
+	*pCurrentPosition += *pMovement;
 			if (pCurrentPosition->x > GetPos().x + m_vtxMinModel.x  && pCurrentPosition->x < GetPos().x + m_vtxMaxModel.x  && pCurrentPosition->z > GetPos().z + m_vtxMinModel.z  && pCurrentPosition->z < GetPos().z + m_vtxMaxModel.z && pCurrentPosition->y > GetPos().y + m_vtxMinModel.y  && pCurrentPosition->y < GetPos().y + m_vtxMaxModel.y)
 			{
 			
@@ -240,6 +246,7 @@ bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition
 					pCurrentPosition->y = GetPos().y + +m_vtxMaxModel.y;
 					pMovement->y = 0.0f;
 				}
+				
 				else if (prevPosition.z <= (GetPos().z + m_vtxMinModel.z) && pCurrentPosition->z >(GetPos().z + m_vtxMinModel.z))
 				{
 					pCurrentPosition->z = GetPos().z + m_vtxMinModel.z;
@@ -261,9 +268,16 @@ bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition
 					pCurrentPosition->z = GetPos().z + +m_vtxMaxModel.z;
 					pMovement->z = 0.0f;
 				}
+				else if (prevPosition.y <= (GetPos().y + m_vtxMinModel.y) && pCurrentPosition->y >(GetPos().y + m_vtxMinModel.y))
+				{
+					pCurrentPosition->y = GetPos().y + m_vtxMinModel.y;
+					pMovement->y = 0.0f;
+				}
+				*pCurrentPosition -= *pMovement;
 				return true;
+				
 			}
-		
+			*pCurrentPosition -= *pMovement;
 	
 	return false;
 }
@@ -347,7 +361,7 @@ D3DXVECTOR3  CObjectX::CalculateNormal(const D3DXVECTOR3& v1, const D3DXVECTOR3&
 bool CObjectX::Ray(D3DXVECTOR3 start, D3DXVECTOR3 end,D3DXVECTOR3 * pPos)
 {
 
-	CRenderer* pRenderer = CManager::GetRenderer();
+	CRenderer* pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリクス
@@ -392,53 +406,53 @@ bool CObjectX::Ray(D3DXVECTOR3 start, D3DXVECTOR3 end,D3DXVECTOR3 * pPos)
 
 	
 
-	if (CManager::RayTri(start, end, v3, v7, v4, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v3, v7, v4, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v4,v7, v8, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v4,v7, v8, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v3, v6, v7, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v3, v6, v7, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v3, v2, v6, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v3, v2, v6, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v2, v1, v6, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v2, v1, v6, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v6, v1, v5, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v6, v1, v5, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v1, v8, v5, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v1, v8, v5, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v1, v4, v8, pPos))
-	{
-		return true;
-	}
-
-	if (CManager::RayTri(start, end, v1, v2, v3, pPos))
-	{
-		return true;
-	}
-	if (CManager::RayTri(start, end, v3, v4, v1, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v1, v4, v8, pPos))
 	{
 		return true;
 	}
 
-	if (CManager::RayTri(start, end, v5, v6, v7, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v1, v2, v3, pPos))
 	{
 		return true;
 	}
-	if (CManager::RayTri(start, end, v7, v8, v5, pPos))
+	if (CManager::GetInstance()->RayTri(start, end, v3, v4, v1, pPos))
+	{
+		return true;
+	}
+
+	if (CManager::GetInstance()->RayTri(start, end, v5, v6, v7, pPos))
+	{
+		return true;
+	}
+	if (CManager::GetInstance()->RayTri(start, end, v7, v8, v5, pPos))
 	{
 		return true;
 	}
@@ -446,7 +460,7 @@ bool CObjectX::Ray(D3DXVECTOR3 start, D3DXVECTOR3 end,D3DXVECTOR3 * pPos)
 }
 CDebri::CDebri(int nPriority) : CObjectX(nPriority)
 {
-	CXManager * pManger = CManager::GetXManager();
+	CXManager * pManger = CManager::GetInstance()->GetXManager();
 	pManger->Release(m_nID);
 }
 

@@ -22,23 +22,9 @@
 #include "xfile.h"
 #include "Xmanager.h"
 #include "enemymanager.h"
+#include "map.h"
 
-CRenderer * CManager::m_pRenderer = NULL;
-CInputKeyboard * CManager::m_pInputKeyboard = NULL;
-CInputGamePad * CManager::m_pInputGamepad = NULL;
-CInputMouse * CManager::m_pInputMouse = NULL;
-CSound * CManager::m_pSound = NULL;
-CDebugProc * CManager::m_pDeb = NULL;
-CTexture * CManager::m_pTexture = NULL;
-CXFile * CManager::m_pXFile = NULL;
-CScene * CManager::m_pScene = NULL;
-CItemManager * CManager::m_pItemManager = NULL;
-CEnemyManager * CManager::m_pEnemyManager = NULL;
-CXManager * CManager::m_pXManager = NULL;
-bool CManager::m_bPause = false;
-int CManager::m_nHitStop = 0;
-int CManager::m_nScoreSave = 0;
-int CManager::m_nLight = 0;
+CManager * CManager::pInstance = NULL;
 //=============================================
 //コンストラクタ
 //=============================================
@@ -59,6 +45,7 @@ CManager::~CManager()
 //=============================================
 HRESULT CManager::Init(HINSTANCE hinstance, HWND hWnd, BOOL bWindow)
 {
+	m_pScene = NULL;
 	m_bPause = false;
 	m_pRenderer = DBG_NEW CRenderer;
 	m_pInputKeyboard = DBG_NEW CInputKeyboard;
@@ -230,6 +217,7 @@ void CManager::SetMode(CScene::MODE mode)
 	
 	CObject::ReleaseAll();
 	m_pScene = CScene::Create(mode);
+	
 }
 //=============================================
 //ポリゴンへのレイ関数

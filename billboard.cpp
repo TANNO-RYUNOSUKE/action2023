@@ -40,7 +40,7 @@ CBillboard::~CBillboard()
 HRESULT CBillboard::Init(void)
 {
 
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
@@ -93,7 +93,7 @@ CBillboard * CBillboard::Create(float fHeight, float fWidth, D3DXVECTOR3 pos, ch
 	pObject3D = DBG_NEW CBillboard;
 	if (pName != NULL)
 	{
-		CTexture * pTex = CManager::GetTexture();
+		CTexture * pTex = CManager::GetInstance()->GetTexture();
 		
 		pObject3D->m_nIdxTex[0] = pTex->Regist(pName);
 	}
@@ -126,7 +126,7 @@ void CBillboard::Uninit(void)
 //=============================================
 void CBillboard::Update(void)
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	VERTEX_3D * pVtx;
@@ -166,8 +166,8 @@ void CBillboard::Draw(void)
 {
 
 
-	CTexture * pTex = CManager::GetTexture();
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	D3DXMATRIX  mtxTrans; //計算用マトリクス

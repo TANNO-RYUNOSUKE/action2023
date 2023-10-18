@@ -41,7 +41,7 @@ CObject2D::~CObject2D()
 HRESULT CObject2D::Init(void)
 {
 	m_bDisp = true;
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
@@ -56,7 +56,7 @@ HRESULT CObject2D::Init(void)
 	{
 		return E_FAIL;
 	}
-	CTexture * pTex = CManager::GetTexture();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
 
 	if (m_pFileName != NULL)
 	{
@@ -140,7 +140,7 @@ void CObject2D::Update(void)
 			return;
 		}
 	}
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
@@ -163,8 +163,8 @@ void CObject2D::Draw(void)
 {
 	if (m_bDisp == true)
 	{
-		CTexture * pTex = CManager::GetTexture();
-		CRenderer * pRenderer = CManager::GetRenderer();
+		CTexture * pTex = CManager::GetInstance()->GetTexture();
+		CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 		LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 		pDevice = pRenderer->GetDevice();
 

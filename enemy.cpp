@@ -54,7 +54,7 @@ CHitBox * CHitBox::Create(D3DXVECTOR3 max, D3DXVECTOR3 min, D3DXVECTOR3 pos, CHi
 CEnemy::CEnemy():CObject()
 {
 	m_rotDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	CEnemyManager * pManger = CManager::GetEnemyManager();
+	CEnemyManager * pManger = CManager::GetInstance()->GetEnemyManager();
 	m_pMotion = NULL;
 	m_nLife = 0;
 	m_nID = -1;
@@ -136,7 +136,7 @@ void CEnemy::Update()
 	posOld = GetPos();
 	
 
-	CSound * pSound = CManager::GetSound();
+	CSound * pSound = CManager::GetInstance()->GetSound();
 
 	if (m_nLife <= 0 )
 	{
@@ -230,8 +230,8 @@ void CEnemy::Update()
 		}
 	}
 
-	CXManager * pManger = CManager::GetXManager();
-	CObjectX ** pObjectX = CManager::GetXManager()->GetX();
+	CXManager * pManger = CManager::GetInstance()->GetXManager();
+	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
 	for (int i = 0; i < NUM_OBJECTX; i++)
 	{
 		if (*(pObjectX + i) != NULL)
@@ -240,7 +240,7 @@ void CEnemy::Update()
 		}
 	}
 
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	//if (pInputKeyboard->GetPress(DIK_K))
 	//{
 	//	m_nLife = 0;
@@ -251,7 +251,7 @@ void CEnemy::Update()
 //=============================================
 void CEnemy::Draw()
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリクス
@@ -303,7 +303,7 @@ CEnemy * CEnemy::Create(D3DXVECTOR3 pos, int nLife)
 void CEnemy::Release(void)
 {
 
-	CManager::GetEnemyManager()->Release(m_nID);
+	CManager::GetInstance()->GetEnemyManager()->Release(m_nID);
 
 	CObject::Release();
 	

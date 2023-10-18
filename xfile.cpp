@@ -51,7 +51,7 @@ void CXFile::Unload(void)
 int CXFile::Regist(std::string pFilename)
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	int nIdx = m_nNumAll;
 	for (int nCnt = 0; nCnt < m_nNumAll; nCnt++)
 	{

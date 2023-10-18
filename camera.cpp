@@ -65,14 +65,14 @@ void CCamera::Uninit()
 //=============================================
 void CCamera::Update()
 {
-	CInputGamePad * pInputGamePad = CManager::GetInputGamePad();
-	CDebugProc * pDeb = CManager::GetDeb();
+	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
+	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 
 	pDeb->Print("視点の座標(X:%f,Y:%f,Z:%f)\n", m_posV.x, m_posV.y, m_posV.z);
 	pDeb->Print("注視点の座標(X:%f,Y:%f,Z:%f)\n", m_posR.x, m_posR.y, m_posR.z);
 	pDeb->Print("カメラの角度(X:%f,Y:%f,Z:%f)\n", m_rot.x, m_rot.y, m_rot.z);
 	pDeb->Print("カメラの距離:%f\n", m_fLengthCamera);
-	CInputMouse * pMouse = CManager::GetInputMouse();
+	CInputMouse * pMouse = CManager::GetInstance()->GetInputMouse();
 	//if (pMouse->GetPress(CInputMouse::MOUSE_LEFT) == true)
 	//{//視点の移動
 
@@ -172,7 +172,7 @@ void CCamera::Update()
 
 
 	//ベクトルを出す
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	D3DXVECTOR3 move = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_vecCamera = m_posV - m_posR;
 
@@ -216,7 +216,7 @@ void CCamera::Update()
 void CCamera::Set()
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 
 	//プロジェクションマトリクスの初期化
 	D3DXMatrixIdentity(&m_mtxProjection);

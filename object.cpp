@@ -128,7 +128,7 @@ void CObject::ReleaseAll(void)
 void CObject::UpDateAll(void)
 {
 	CObject * pObject;
-	CManager::GetDeb()->Print("現在のオブジェクト数:%d\n", m_nNumALL);
+	CManager::GetInstance()->GetDeb()->Print("現在のオブジェクト数:%d\n", m_nNumALL);
 	for (int nPriority = 0; nPriority < NUM_PRIORITY; nPriority++)
 	{
 		pObject = m_apTop[nPriority];
@@ -152,7 +152,7 @@ void CObject::UpDateAll(void)
 //=============================================
 void CObject::DrawAll(void)
 {
-	CCamera * pCamera = CManager::GetScene()->GetCamera();
+	CCamera * pCamera = CManager::GetInstance()->GetScene()->GetCamera();
 	if (pCamera != NULL)
 	{
 		pCamera->Set();

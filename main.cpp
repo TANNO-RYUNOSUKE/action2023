@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePlev, LPSTR lpCmdline
 		NULL);
 	
 	
-	pManager = DBG_NEW  CManager;
+	pManager = CManager::GetInstance();
 	int nCountFPS = 0;
 
 	//‰Šú‰»İ’è
@@ -88,7 +88,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePlev, LPSTR lpCmdline
 	{
 		return -1;
 	};
-	pDev = CManager::GetDeb();
+	pDev = CManager::GetInstance()->GetDeb();
 
 	
 	//•ª‰ğ”\‚ğİ’è

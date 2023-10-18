@@ -111,6 +111,12 @@
     <ClInclude Include="particle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="map.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -194,10 +200,33 @@
     <ClCompile Include="particle.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="map.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BloomEffect.fx">
       <Filter>シェーダーファイル</Filter>
     </FxCompile>
+    <FxCompile Include="dot.fx">
+      <Filter>シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="linear.fx">
+      <Filter>シェーダーファイル</Filter>
+    </FxCompile>
+    <FxCompile Include="Gauss.fx">
+      <Filter>シェーダーファイル</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="DownSample.fx">
+      <Filter>シェーダーファイル</Filter>
+    </Text>
+    <Text Include="BrightCheck.fx">
+      <Filter>シェーダーファイル</Filter>
+    </Text>
   </ItemGroup>
 </Project>

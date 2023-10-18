@@ -57,7 +57,7 @@ void CTexture::Unload(void)
 //=============================================
 int CTexture::Regist(char * pFilename)
 {
-	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	int nIdx = m_nNumAll;
 
 	for (int nCnt = 0; nCnt < m_nNumAll; nCnt++)

@@ -22,7 +22,7 @@ CLight::~CLight()
 HRESULT CLight::Init(void)
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 
 	D3DXVECTOR3 vecDir; //設定用方向ベクトル
 	//ライトの情報をクリアする

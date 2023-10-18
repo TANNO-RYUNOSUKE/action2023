@@ -57,7 +57,7 @@ void CMotion::Uninit(void)
 }
 void CMotion::Update(void)
 {
-	CDebugProc * pDeb = CManager::GetDeb();
+	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 	if (m_nType > -1 && m_nType <= m_nNumAll)
 	{
 		for (int nCnt = 0; nCnt < m_nNumModel; nCnt++)

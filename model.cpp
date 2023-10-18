@@ -51,13 +51,13 @@ HRESULT CModel::Init(void)
 	int nNumVtx = 0; //頂点数
 	DWORD dwSizeFVF; //頂点フォーマットのサイズ
 	BYTE*pVtxBuff = NULL; //頂点バッファへのポインタ
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
 
-	CTexture * pTex = CManager::GetTexture();
-	CXFile * pXFile = CManager::GetXFiles();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
+	CXFile * pXFile = CManager::GetInstance()->GetXFiles();
 	m_nIdxXFile = pXFile->Regist(m_pModelName);
 	//xファイルの読み込み
 	/*if (D3DXLoadMeshFromX(m_pModelName,
@@ -170,7 +170,7 @@ void CModel::Uninit(void)
 //=============================================
 void CModel::Update(void)
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
@@ -182,9 +182,9 @@ void CModel::Update(void)
 void CModel::Draw(void)
 {
 
-	CTexture * pTex = CManager::GetTexture();
-	CXFile * pXFile = CManager::GetXFiles();
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
+	CXFile * pXFile = CManager::GetInstance()->GetXFiles();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 

@@ -25,9 +25,9 @@
 
 
 //マクロ定義
-#define MOVE_PLAYER (2.5f)
+#define MOVE_PLAYER (2.0f)
 #define DASH_PLAYER (6.0f)
-#define JUMP_PLAYER (30.0f)
+#define JUMP_PLAYER (20.0f)
 //=============================================
 //コンストラクタ
 //=============================================
@@ -72,7 +72,7 @@ HRESULT CPlayer::Init()
 	m_pMotionUp->SetModel(&m_apModel[0]);
 
 	m_pMotionUp->Load("data\\TEXT\\motion_player.txt");
-	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), GetPos(), 1000);
+	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), GetPos(), 500);
 	m_pLight->GetLight()->Falloff = 100.0f;
 	m_pLight->GetLight()->Attenuation0 = 2.0f;
 	m_pLight->GetLight()->Attenuation1 = 0.0f;
@@ -110,9 +110,9 @@ void CPlayer::Uninit()
 void CPlayer::Update()
 {
 	
-	CSound * pSound = CManager::GetSound();
-	CInputGamePad * pInputGamePad = CManager::GetInputGamePad();
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
+	CSound * pSound = CManager::GetInstance()->GetSound();
+	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	//モーション更新
 
 	m_pMotionUp->Update();
@@ -123,29 +123,29 @@ void CPlayer::Update()
 	
 
 
-	CCamera * pCamera = CManager::GetScene()->GetCamera();
-	CDebugProc * pDeb = CManager::GetDeb();
+	CCamera * pCamera = CManager::GetInstance()->GetScene()->GetCamera();
+	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 
 
 	//注視点の座標設定
 	D3DXVECTOR3 seepos = GetPos();
 	
-	if (!CManager::GetPause())
+	if (!CManager::GetInstance()->GetPause())
 	{
 		seepos.y += 100.0f;
-	
+		//seepos.y += 200.0f;
+		m_pLight->SetPos(seepos);
 		pCamera->SetRDest(seepos);
-		seepos.z -= 500.0f;
+		seepos.z -= 750.0f;
 		seepos.y += 50.0f;
 		pCamera->SetVDest(seepos);
 	}
-	seepos.z += 500.0f;
-	m_pLight->SetPos(seepos);
+	
 
 	pDeb->Print("WASD:移動\n");
 	pDeb->Print("プレイヤーの座標(X:%f,Y:%f,Z:%f)\n", GetPos().x, GetPos().y, GetPos().z);
 	pDeb->Print("プレイヤーの移動値(X:%f,Y:%f,Z:%f)\n", GetMove().x, GetMove().y, GetMove().z);
-	pDeb->Print("ライトの数:%d\n", CManager::GetLightCount());
+	pDeb->Print("ライトの数:%d\n", CManager::GetInstance()->GetLightCount());
 	//頂点座標の設定
 
 	
@@ -184,7 +184,7 @@ void CPlayer::Update()
 //=============================================
 void CPlayer::Draw()
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans; //計算用マトリクス
@@ -254,10 +254,10 @@ void CPlayer::Move()
 
 	SetPosOld(GetPos());//posoldの更新
 
-	CInputKeyboard * pInputKeyboard = CManager::GetInputKeyboard();
-	CInputGamePad * pInputGamePad = CManager::GetInputGamePad();
+	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
+	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
 
-	CInputMouse * pMouse = CManager::GetInputMouse();
+	CInputMouse * pMouse = CManager::GetInstance()->GetInputMouse();
 
 	D3DXVECTOR3 pos = GetPos();
 
@@ -315,8 +315,8 @@ void CPlayer::Move()
 	SetRot(rot);
 	SetMove(move);
 	
-	CXManager * pManger = CManager::GetXManager();
-	CObjectX ** pObjectX = CManager::GetXManager()->GetX();
+	CXManager * pManger = CManager::GetInstance()->GetXManager();
+	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
 	m_bLand = false;
 	for (int i = 0; i < NUM_OBJECTX; i++)
 	{
@@ -324,11 +324,11 @@ void CPlayer::Move()
 		{
 			if (pObjectX[i]->Collision(GetPosOld(), GetPosAddress(), GetMoveAddress(),&m_bLand))
 			{
-				break;
+				
 			}
 		}
 	}
-    CItemManager * pItemmanager =	CManager::GetItemManager();
+    CItemManager * pItemmanager = CManager::GetInstance()->GetItemManager();
 }
 D3DXVECTOR3 CPlayer::LinePrediction(D3DXVECTOR3 shotPosition, D3DXVECTOR3 targetPosition, D3DXVECTOR3 targetPrePosition, float bulletSpeed)
 {

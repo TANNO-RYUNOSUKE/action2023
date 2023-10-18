@@ -62,7 +62,7 @@ HRESULT CBullet::Init()
 	SetType(CObject::TYPE_BULLET);
 	m_nMoveCount = 0;
 	m_nHomingCount = 0;
-	CTexture * pTex = CManager::GetTexture();
+	CTexture * pTex = CManager::GetInstance()->GetTexture();
 	
 	m_nIdxTex[0] = pTex->Regist("data\\TEXTURE\\Bullet000.png");
 
@@ -129,8 +129,8 @@ void CBullet::Update()
 	SetPos(GetPos() + GetMove());
 	m_nLife--;
 	bool bRay = false;
-	CXManager * pManger = CManager::GetXManager();
-	CObjectX ** pObjectX = CManager::GetXManager()->GetX();
+	CXManager * pManger = CManager::GetInstance()->GetXManager();
+	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
 	for (int i = 0; i < NUM_OBJECTX; i++)
 	{
 		if (*(pObjectX + i) != NULL)
@@ -166,7 +166,7 @@ void CBullet::Update()
 //=============================================
 void CBullet::Draw()
 {
-	CRenderer * pRenderer = CManager::GetRenderer();
+	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
@@ -197,7 +197,7 @@ CBullet * CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, int nLife, TYPE typ
 	pBullet->SetWidth(5.0f);
 	pBullet->SetHeight(5.0f);
 	pBullet->SetMove(move);
-	pBullet->m_fSpeed = CManager::GetDistance(move);
+	pBullet->m_fSpeed = CManager::GetInstance()->GetDistance(move);
 	pBullet->m_Type = type;
 	pBullet->m_nLife = nLife;
 	pBullet->m_pTarget = pTag;
@@ -208,10 +208,10 @@ CBullet * CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, int nLife, TYPE typ
 
 void CBullet::Homing(float fPower)
 {
-	CPlayer * pPlayer = CManager::GetScene()->GetPlayer();
+	CPlayer * pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
 	if (pPlayer != NULL)
 	{
-		float fSpeed = CManager::GetDistance(GetMove());
+		float fSpeed = CManager::GetInstance()->GetDistance(GetMove());
 		D3DXVECTOR3 Move = GetMove();
 		D3DXVec3Normalize(&Move, &Move);
 	
@@ -266,7 +266,7 @@ bool CBullet::CollisionEnemy(D3DXVECTOR3 pos)
 }
 bool CBullet::CollisionPlayer(D3DXVECTOR3 pos)
 {
-	CPlayer * pPlayer = CManager::GetScene()->GetPlayer();
+	CPlayer * pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
 	if (pPlayer != NULL)
 	{
 		

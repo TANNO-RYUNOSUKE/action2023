@@ -42,7 +42,7 @@ void CFade::Uninit()
 void CFade::Update()
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	VERTEX_2D * pVtx;
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 	D3DXCOLOR col = GetCol();
@@ -79,7 +79,7 @@ void CFade::Update()
 		if (col.a >= 1.0f)
 		{
 			m_State = STATE_NONE;
-			CManager::SetMode(m_modenext);
+			CManager::GetInstance()->SetMode(m_modenext);
 		}
 	}
 }

@@ -42,52 +42,61 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	static void SetPause(bool bPause) { m_bPause = bPause; }
-	static void SetHitStop(int nStop) { m_nHitStop = nStop; }
-	static int GetHitStop(void) { return m_nHitStop; }
-	static void SetScore(int nScore) { m_nScoreSave = nScore; }
-	static int GetScore(void) { return m_nScoreSave; }
-	static	bool GetPause(void) { return m_bPause; }
-	static void SetMode(CScene::MODE mode);
-	static CScene * GetMode(void);
+	 void SetPause(bool bPause) { m_bPause = bPause; }
+	 void SetHitStop(int nStop) { m_nHitStop = nStop; }
+	 int GetHitStop(void) { return m_nHitStop; }
+	 void SetScore(int nScore) { m_nScoreSave = nScore; }
+	 int GetScore(void) { return m_nScoreSave; }
+		bool GetPause(void) { return m_bPause; }
+	 void SetMode(CScene::MODE mode);
+	 CScene * GetMode(void);
 
-	static void ReSetItem(void);
-	static float GetDistance(D3DXVECTOR3 vec);
-	static bool RayTri(const D3DXVECTOR3& startPoint, const D3DXVECTOR3& endPoint, const D3DXVECTOR3& polypos1, const D3DXVECTOR3& polypos2, const D3DXVECTOR3& polypos3,D3DXVECTOR3 * pPos = NULL);
+	 void ReSetItem(void);
+	 float GetDistance(D3DXVECTOR3 vec);
+	 bool RayTri(const D3DXVECTOR3& startPoint, const D3DXVECTOR3& endPoint, const D3DXVECTOR3& polypos1, const D3DXVECTOR3& polypos2, const D3DXVECTOR3& polypos3,D3DXVECTOR3 * pPos = NULL);
 
-	static CInputKeyboard * GetInputKeyboard(void);
-	static CInputGamePad * GetInputGamePad(void);
-	static CInputMouse * GetInputMouse(void);
-	static CRenderer * GetRenderer(void);
+	 CInputKeyboard * GetInputKeyboard(void);
+	 CInputGamePad * GetInputGamePad(void);
+	 CInputMouse * GetInputMouse(void);
+	 CRenderer * GetRenderer(void);
 
-	static CDebugProc * GetDeb(void);
-	static CSound * GetSound(void) { return m_pSound; }
-	static CTexture * GetTexture(void) { return m_pTexture; }
-	static CXFile * GetXFiles(void) { return m_pXFile; }
-	static CEnemyManager * GetEnemyManager(void) { return m_pEnemyManager; }
-	static CItemManager * GetItemManager(void) { return m_pItemManager; }
-	static CXManager * GetXManager(void) { return m_pXManager; }
-	static CScene * GetScene(void){ return m_pScene; }
+	 CDebugProc * GetDeb(void);
+	 CSound * GetSound(void) { return m_pSound; }
+	 CTexture * GetTexture(void) { return m_pTexture; }
+	 CXFile * GetXFiles(void) { return m_pXFile; }
+	 CEnemyManager * GetEnemyManager(void) { return m_pEnemyManager; }
+	 CItemManager * GetItemManager(void) { return m_pItemManager; }
+	 CXManager * GetXManager(void) { return m_pXManager; }
+	 CScene * GetScene(void){ return m_pScene; }
 
-	static int GetLightCount(void) { return m_nLight; }
-	static void SetLightCount(int nCount) { m_nLight = nCount; }
+	 int GetLightCount(void) { return m_nLight; }
+	 void SetLightCount(int nCount) { m_nLight = nCount; }
+
+	 static CManager * GetInstance() {
+		 if (pInstance == NULL) { pInstance = DBG_NEW CManager; return pInstance; }
+		 else
+		 {
+			 return pInstance;
+		 }
+	 }
 private:
-	static CRenderer * m_pRenderer; //レンダラーのポインタ
-	static CInputKeyboard * m_pInputKeyboard;//キーボードのポインタ
-	static CInputGamePad * m_pInputGamepad;//キーボードのポインタ
-	static CInputMouse * m_pInputMouse;//キーボードのポインタ
-	static CDebugProc * m_pDeb;//デバッグ表示のポインタ
-	static CSound * m_pSound;//サウンドポインタ
-	static CTexture * m_pTexture;//テクスチャのポインタ
-	static CXFile * m_pXFile;
-	static CEnemyManager * m_pEnemyManager; //エネミーマネージャのポインタ
-	static CItemManager * m_pItemManager; //アイテムマネージャのポインタ
-	static CXManager * m_pXManager; //エネミーマネージャのポインタ
-	static CScene * m_pScene;//シーン
-	static bool m_bPause;
-	static int m_nHitStop;
-	static int m_nScoreSave;
-	static int m_nLight;
+	static CManager * pInstance;
+	CRenderer * m_pRenderer; //レンダラーのポインタ
+	CInputKeyboard * m_pInputKeyboard;//キーボードのポインタ
+	CInputGamePad * m_pInputGamepad;//キーボードのポインタ
+	CInputMouse * m_pInputMouse;//キーボードのポインタ
+	CDebugProc * m_pDeb;//デバッグ表示のポインタ
+	CSound * m_pSound;//サウンドポインタ
+	CTexture * m_pTexture;//テクスチャのポインタ
+	CXFile * m_pXFile;
+	CEnemyManager * m_pEnemyManager; //エネミーマネージャのポインタ
+	CItemManager * m_pItemManager; //アイテムマネージャのポインタ
+	CXManager * m_pXManager; //エネミーマネージャのポインタ
+	CScene * m_pScene;//シーン
+	bool m_bPause;
+	int m_nHitStop;
+	int m_nScoreSave;
+	int m_nLight;
 };
 
 

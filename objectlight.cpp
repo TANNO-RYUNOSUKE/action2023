@@ -25,9 +25,9 @@ CObjectLight::~CObjectLight()
 HRESULT CObjectLight::Init()
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
-	m_nID = CManager::GetLightCount() + 1;
-	CManager::SetLightCount(m_nID);
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+	m_nID = CManager::GetInstance()->GetLightCount() + 1;
+	CManager::GetInstance()->SetLightCount(m_nID);
 	//ライトを設定する
 	if (m_nID > 0)
 	{
@@ -38,7 +38,7 @@ HRESULT CObjectLight::Init()
 	}
 	else
 	{
-		CManager::SetLightCount(1);
+		CManager::GetInstance()->SetLightCount(1);
 		m_nID = 1;
 		pDevice->SetLight(m_nID, m_pLight);
 		//ライトを有効にする
@@ -53,10 +53,10 @@ HRESULT CObjectLight::Init()
 void CObjectLight::Uninit()
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	if (m_pLight != NULL)
 	{
-		CManager::SetLightCount(CManager::GetLightCount()-1);
+		CManager::GetInstance()->SetLightCount(CManager::GetInstance()->GetLightCount()-1);
 		ZeroMemory(m_pLight, sizeof(D3DLIGHT9));
 		//ライトを設定する
 		pDevice->SetLight(m_nID, m_pLight);
@@ -71,7 +71,7 @@ void CObjectLight::Uninit()
 void CObjectLight::Update()
 {
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
-	pDevice = CManager::GetRenderer()->GetDevice();
+	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 
 	m_pLight->Position = GetPos();
 
