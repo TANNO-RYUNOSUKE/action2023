@@ -53,7 +53,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 	{
 		for (int j = 0; j < c_nObjectY; j++)
 		{
-			D3DXVECTOR3 pos{ 250.0f*i,250.0f*j, 0 };
+			D3DXVECTOR3 pos{ 250.0f*i,-250.0f*j, 0 };
 			switch (nMapID[i + j * c_nObjectX])
 			{
 			case -1://‹ó”’
@@ -63,7 +63,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				
 				if (pPlayer != NULL)
 				{
-					pos.y -= c_fObjectMinSize;
+					
 					pPlayer->SetPos(pos);
 				}
 				else

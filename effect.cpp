@@ -83,7 +83,7 @@ void CEffect::Update()
 	SetHeight(GetHeight() *m_fAttenuation);
 	m_Color.a = (float)m_nLife / (float)m_nMaxLife;
 	m_nLife--;
-
+	SetMove(GetMove()* 0.95f);
 	if (m_nLife <= 0)
 	{
 		CObject::Release();

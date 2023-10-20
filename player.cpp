@@ -22,11 +22,14 @@
 #include "sound.h"
 #include "objectX.h"
 #include "Xmanager.h"
-
+#include <assert.h>
+#include "particle.h"
+#include "enemymanager.h"
+#include "enemy.h"
 
 //ƒ}ƒNƒ’è‹`
 #define MOVE_PLAYER (2.0f)
-#define DASH_PLAYER (6.0f)
+#define DASH_PLAYER (30.0f)
 #define JUMP_PLAYER (20.0f)
 //=============================================
 //ƒRƒ“ƒXƒgƒ‰ƒNƒ^
@@ -41,7 +44,8 @@ CPlayer::CPlayer(int nPriority):CObject(nPriority)
 	}
 
 	SetType(CObject::TYPE_PLAYER);
-
+	m_state = STATE_NEUTRAL;
+	m_nStateCount = 0;
 	m_nLife = 0;
 
 	m_pFilterDamage = NULL;
@@ -59,7 +63,7 @@ CPlayer::~CPlayer()
 //=============================================
 HRESULT CPlayer::Init()
 {
-	
+	m_pTarget = NULL;
 	m_pFilterDamage = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, SCREEN_WIDTH, 0, "data\\TEXTURE\\RedFilter.png");
 	m_pFilterDamage->SetDisp(false);
 	
@@ -155,7 +159,25 @@ void CPlayer::Update()
 
 	if (pInputKeyboard->GetTrigger(DIK_LSHIFT))
 	{
-		CBullet::Create(D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43), -CBullet::AnglesToVector(GetRot()) * 50.0f, 6, CBullet::TYPE_PLAYER, false);
+		D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43);
+		if (m_pTarget != NULL)
+		{
+			if (*m_pTarget)
+			{
+				D3DXVECTOR3 vec = pos - ((*m_pTarget)->GetPos() + (*m_pTarget)->GetModel()->GetPos());
+				D3DXVec3Normalize(&vec, &vec);
+				CBullet::Create(pos, -vec * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+			}
+			else
+			{
+				CBullet::Create(pos, -CBullet::AnglesToVector(GetRot()) * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+			}
+		}
+		else
+		{
+			CBullet::Create(pos, -CBullet::AnglesToVector(GetRot()) * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+		}
+		
 	}
 
 	if (m_nLife <= 0)
@@ -177,7 +199,81 @@ void CPlayer::Update()
 		
 		Release();
 	}
-	
+	m_nStateCount--;
+	if (m_nStateCount <= 0)
+	{
+		m_nStateCount = 0;
+		switch (m_state)
+		{
+		case CPlayer::STATE_NONE:
+			break;
+		case CPlayer::STATE_NEUTRAL:
+			break;
+		case CPlayer::STATE_DASH:
+			SetState(STATE_HOVER, 60);
+			break;
+		case CPlayer::STATE_HOVER:
+			m_state = STATE_NEUTRAL;
+			break;
+		case CPlayer::STATE_MAX:
+			break;
+		default:
+			assert(false);
+			break;
+		}
+	}
+	CEnemy ** pEnemy = CManager::GetInstance()->GetEnemyManager()->GetEnemy();
+	D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[0]->GetMatrix()._41, m_apModel[0]->GetMatrix()._42, m_apModel[0]->GetMatrix()._43);
+	switch (m_state)
+	{
+	case CPlayer::STATE_NONE:
+		break;
+	case CPlayer::STATE_NEUTRAL:
+		break;
+	case CPlayer::STATE_DASH:
+		
+		for (int i = 0; i < NUM_ENEMY; i++, pEnemy++)
+		{
+			
+				if (*pEnemy != NULL)
+				{
+					CModel * pModel = (*pEnemy)->GetModel();
+					CHitBox * pHitBox = (*pEnemy)->GetHitBox();
+					do
+					{
+						D3DXVECTOR3 max = pHitBox->GetMax() + (*pEnemy)->GetPos();
+						D3DXVECTOR3 min = pHitBox->GetMin() + (*pEnemy)->GetPos();
+
+						if (pos.x <= max.x + 100.0f && pos.y <= max.y + 100.0f && pos.z <= max.z + 100.0f)
+						{
+							if (pos.x >= min.x - 100.0f && pos.y >= min.y - 100.0f && pos.z >= min.z - 100.0f)
+							{
+								(*pEnemy)->AddLife(-1);
+								SetState(STATE_HOVER, 60);
+								m_pTarget = pEnemy;
+								D3DXVECTOR3 move = GetMove();
+								move.y = 20.0f;
+								SetMove(move);
+								CParticle::Create(D3DXVECTOR3(m_apModel[1]->GetMatrix()._41, m_apModel[1]->GetMatrix()._42, m_apModel[1]->GetMatrix()._43), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 80.0f, 3, 5, 1.01f);
+								CParticle::Create(D3DXVECTOR3(m_apModel[1]->GetMatrix()._41, m_apModel[1]->GetMatrix()._42, m_apModel[1]->GetMatrix()._43), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 480.0f, 30, 1);
+								break;
+							}
+						}
+						pHitBox = pHitBox->GetNext();
+					} while (pHitBox != NULL);
+
+				}
+			
+		}
+		break;
+	case CPlayer::STATE_HOVER:
+		break;
+	case CPlayer::STATE_MAX:
+		break;
+	default:
+		assert(false);
+		break;
+	}
 }
 //=============================================
 //•`‰æŠÖ”
@@ -271,21 +367,49 @@ void CPlayer::Move()
 
 
 	//ˆÚ“®
-	
-	if (pInputKeyboard->GetPress(DIK_A))
+	if (m_state == STATE_NEUTRAL)
 	{
-		move.x -= fSpeed;
-		bMove = true;
+		if (pInputKeyboard->GetPress(DIK_A))
+		{
+			move.x -= fSpeed;
+			bMove = true;
+		}
+		if (pInputKeyboard->GetPress(DIK_D))
+		{
+			move.x += fSpeed;
+			bMove = true;
+		}
+		if ((pInputKeyboard->GetTrigger(DIK_W)) && m_bLand == true)
+		{
+			move.y = JUMP_PLAYER;
+			m_bLand = false;
+		}
 	}
-	if (pInputKeyboard->GetPress(DIK_D))
+	if (pInputKeyboard->GetTrigger(DIK_SPACE))
 	{
-		move.x += fSpeed;
-		bMove = true;
-	}
-	if ((pInputKeyboard->GetTrigger(DIK_SPACE) || pInputKeyboard->GetTrigger(DIK_W)) && m_bLand == true)
-	{
-		move.y = JUMP_PLAYER;
-		m_bLand = false;
+		D3DXVECTOR3 vec{ 0.0f,0.0f, 0.0f };
+		if (pInputKeyboard->GetPress(DIK_W))
+		{
+			vec.y += 0.5f;
+		}
+		if (pInputKeyboard->GetPress(DIK_A))
+		{
+			vec.x -= 1.0f;
+		}
+		if (pInputKeyboard->GetPress(DIK_S))
+		{
+			vec.y -= 0.5f;
+		}
+		if (pInputKeyboard->GetPress(DIK_D))
+		{
+			vec.x += 1.0f;
+		}
+		if (vec.x != 0.0f)
+		{
+			D3DXVec3Normalize(&vec, &vec);
+			move = vec * DASH_PLAYER;
+			SetState(STATE_DASH, 20);
+		}
 	}
 
 	if (!m_bLand)
@@ -306,11 +430,43 @@ void CPlayer::Move()
 	}
 	
 	//ƒWƒƒƒ“ƒv
+	if (move.x != 0 )
+	{
+		rot.y = atan2f(-move.x, -move.z);
+	}
 
-	rot.y = atan2f(-move.x, -move.z);
-	move.y -= GRAVITY;//d—Í‚ð—^‚¦‚é
-	move.x *= 0.9f;//Œ´‘¥ŒW”
-	move.z *= 0.9f;//Œ´‘¥ŒW”
+	switch (m_state)
+	{
+	case CPlayer::STATE_NONE:
+		break;
+	case CPlayer::STATE_NEUTRAL:
+		move.y -= GRAVITY;//d—Í‚ð—^‚¦‚é
+		move.x *= 0.9f;//Œ´‘¥ŒW”
+		move.z *= 0.9f;//Œ´‘¥ŒW”
+		break;
+	case CPlayer::STATE_DASH:
+		CParticle::Create(D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43), D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f), 1, 12, 10.0f, 20, 6, 1.01f);
+		move.x *= 0.99f;//Œ´‘¥ŒW”
+		move.z *= 0.99f;//Œ´‘¥ŒW”
+		break;
+	case CPlayer::STATE_HOVER:
+		move.y -= GRAVITY * 0.33f;//d—Í‚ð—^‚¦‚é
+		move *= 0.95f;//Œ´‘¥ŒW”
+		break;
+	case CPlayer::STATE_MAX:
+		break;
+	default:
+
+		break;
+	}
+	if (m_state == STATE_DASH)
+	{
+		
+	}
+	else
+	{
+	
+	}
 	SetPos(pos + move);
 	SetRot(rot);
 	SetMove(move);
@@ -318,13 +474,17 @@ void CPlayer::Move()
 	CXManager * pManger = CManager::GetInstance()->GetXManager();
 	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
 	m_bLand = false;
+
 	for (int i = 0; i < NUM_OBJECTX; i++)
 	{
 		if (*(pObjectX + i) != NULL)
 		{
 			if (pObjectX[i]->Collision(GetPosOld(), GetPosAddress(), GetMoveAddress(),&m_bLand))
 			{
-				
+				if (m_state == STATE_HOVER)
+				{
+					m_state = STATE_NEUTRAL;
+				}
 			}
 		}
 	}

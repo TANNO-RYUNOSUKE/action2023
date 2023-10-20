@@ -211,7 +211,9 @@ HRESULT CGame::Init()
 	m_pCamera = DBG_NEW CCamera;
 	m_pLight = DBG_NEW CLight;
 	m_pPlayer = CPlayer::Create();
-	CEnemy_Walker::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 10);
+	CEnemy_Walker::Create(D3DXVECTOR3(3000.0f, -2000.0f, 0.0f), 10);
+	CEnemy_Walker::Create(D3DXVECTOR3(3100.0f, -2000.0f, 0.0f), 10);
+	CEnemy_Walker::Create(D3DXVECTOR3(3200.0f, -2000.0f, 0.0f), 10);
 	CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", m_pPlayer);
 	//èâä˙âªê›íË;
 	

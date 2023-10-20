@@ -12,7 +12,7 @@
 #include "motion.h"
 
 
-class CHitBox //マネージャクラス
+class CHitBox //ヒットボックス
 {
 public:
 	CHitBox();

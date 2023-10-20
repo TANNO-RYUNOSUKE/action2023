@@ -1,6 +1,6 @@
 sampler2D inputTexture : register(s0);
 
-float threshold = 0.0; // しきい値
+float threshold = 0.4; // しきい値
 
 float4 main(float2 texCoord : TEXCOORD0) : COLOR
 {
@@ -14,7 +14,7 @@ float4 main(float2 texCoord : TEXCOORD0) : COLOR
 	if (luminance >= threshold)
 	{
 		// 色の明るさを半分にして新しい色を生成
-		float4 newColor = color * 0.05;
+		float4 newColor = color;
 		return newColor;
 	}
 	else

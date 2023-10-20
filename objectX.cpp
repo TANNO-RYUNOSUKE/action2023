@@ -281,6 +281,51 @@ bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition
 	
 	return false;
 }
+bool CObjectX::CollisionX(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement)
+{
+
+	if (pCurrentPosition->y > GetPos().y + m_vtxMinModel.y  && pCurrentPosition->y < GetPos().y + m_vtxMaxModel.y)
+	{
+		 if (prevPosition.x <= (GetPos().x + m_vtxMinModel.x) && pCurrentPosition->x > (GetPos().x + m_vtxMinModel.x))
+		{
+			pCurrentPosition->x = GetPos().x + m_vtxMinModel.x;
+			pMovement->x = 0.0f;
+			return true;
+		}
+		else if (prevPosition.x >= GetPos().x + m_vtxMaxModel.x && pCurrentPosition->x < GetPos().x + m_vtxMaxModel.x)
+		{
+			pCurrentPosition->x = GetPos().x + +m_vtxMaxModel.x;
+			pMovement->x = 0.0f;
+			return true;
+		}
+	}
+	return false;
+}
+bool CObjectX::CollisionY(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, bool * pLand)
+{
+	if (pCurrentPosition->x > GetPos().x + m_vtxMinModel.x)
+	{
+		if (prevPosition.y >= GetPos().y + m_vtxMaxModel.y && pCurrentPosition->y < GetPos().y + m_vtxMaxModel.y)
+		{
+			if (pLand != NULL)
+			{
+				*pLand = true;
+			}
+
+			pCurrentPosition->y = GetPos().y + +m_vtxMaxModel.y;
+			pMovement->y = 0.0f;
+			return true;
+		}
+		else if (prevPosition.y <= (GetPos().y + m_vtxMinModel.y) && pCurrentPosition->y >(GetPos().y + m_vtxMinModel.y))
+		{
+			pCurrentPosition->y = GetPos().y + m_vtxMinModel.y;
+			pMovement->y = 0.0f;
+			return true;
+		}
+	}
+	return false;
+}
+
 //=============================================
 //ƒŒƒC
 //=============================================

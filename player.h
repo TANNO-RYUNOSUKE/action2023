@@ -48,6 +48,15 @@ public:
 		LOWERMOTION_MAX
 	}LOWERMOTION;
 
+	typedef enum 
+	{
+		STATE_NONE = 0,
+		STATE_NEUTRAL,
+		STATE_DASH,
+		STATE_HOVER,
+		STATE_MAX
+	}STATE;
+
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -66,12 +75,14 @@ public:
 	static D3DXVECTOR3 LinePrediction(D3DXVECTOR3 shotPosition, D3DXVECTOR3 targetPosition, D3DXVECTOR3 targetPrePosition, float bulletSpeed);
 	static float PlusMin(float a, float b);
 	CModel * GetModelUp(void) { return m_apModel[0]; }
+	void SetState(STATE state, int nCnt) { m_state = state; m_nStateCount = nCnt; }
 private:
-
+	STATE m_state;
+	int m_nStateCount;
 	CObject2D * m_pFilterDamage;
 	int m_nLife;//体力
 	CMotion * m_pMotionUp;//モーションポインタ
-
+	CEnemy ** m_pTarget;
 	D3DXVECTOR3 m_posOld;//1フレーム前の座標
 	D3DXVECTOR3 m_rotShot; //射撃方向
 	bool m_bLand;//着地したかどうか

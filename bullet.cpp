@@ -11,7 +11,7 @@
 #include "object2D.h"
 #include "bullet.h"
 #include "input.h"
-
+#include "enemymanager.h"
 #include "enemy.h"
 #include "sound.h"
 #include "effect.h"
@@ -66,11 +66,7 @@ HRESULT CBullet::Init()
 	
 	m_nIdxTex[0] = pTex->Regist("data\\TEXTURE\\Bullet000.png");
 
-	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(1.0f, 0.75f, 0.3f, 1.0f), GetPos(), 400);
-	m_pLight->GetLight()->Falloff = 1.0f;
-	m_pLight->GetLight()->Attenuation0 = 2.0f;
-	m_pLight->GetLight()->Attenuation1 = 0.0f;
-	m_pLight->GetLight()->Attenuation2 = 0.0f;
+
 	return S_OK;
 }
 //=============================================
@@ -87,7 +83,6 @@ void CBullet::Uninit()
 //=============================================
 void CBullet::Update()
 {
-	m_pLight->SetPos(GetPos());
 	D3DXVECTOR3 vec;
 	D3DXVECTOR3 pos1, pos2;
 	pos1 = GetPos(); pos2 = GetPos();
@@ -147,15 +142,10 @@ void CBullet::Update()
 	{
 		
 	
-		CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 15, 80.0f, 30, 5,1.01f);
-		CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 15, 480.0f, 300, 1);
+		CParticle::Create(CBullet::GetPos(), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 8.0f, 3, 5,1.01f);
+		CParticle::Create(CBullet::GetPos(), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 48.0f, 30, 1);
 		
 	
-		if (m_pLight != NULL)
-		{
-			m_pLight->Release();
-			m_pLight = NULL;
-		}
 		
 		CObject::Release();
 	}
@@ -194,8 +184,8 @@ CBullet * CBullet::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, int nLife, TYPE typ
 	
 	pBullet->SetPos(pos);
 	pBullet->m_posOld = pos;;
-	pBullet->SetWidth(5.0f);
-	pBullet->SetHeight(5.0f);
+	pBullet->SetWidth(10.0f);
+	pBullet->SetHeight(10.0f);
 	pBullet->SetMove(move);
 	pBullet->m_fSpeed = CManager::GetInstance()->GetDistance(move);
 	pBullet->m_Type = type;
@@ -260,7 +250,35 @@ void CBullet::Homing(float fPower)
 //=============================================
 bool CBullet::CollisionEnemy(D3DXVECTOR3 pos)
 {
+	CEnemy ** pTarget = NULL;
+	pTarget = CManager::GetInstance()->GetEnemyManager()->GetEnemy();
+	for (int i = 0; i < NUM_ENEMY; i++, pTarget++)
+	{
+		if (*pTarget != NULL)
+		{
+			CModel * pModel = (*pTarget)->GetModel();
+			CHitBox * pHitBox = (*pTarget)->GetHitBox();
+			do
+			{
+				D3DXVECTOR3 max = pHitBox->GetMax() + (*pTarget)->GetPos();
+				D3DXVECTOR3 min = pHitBox->GetMin() + (*pTarget)->GetPos();
 
+				if (pos.x <= max.x + 100.0f && pos.y <= max.y + 100.0f && pos.z <= max.z + 100.0f)
+				{
+					if (pos.x >= min.x - 100.0f && pos.y >= min.y - 100.0f && pos.z >= min.z - 100.0f)
+					{
+						m_nLife = 0;
+						(*pTarget)->AddLife(-1);
+
+						return true;
+					}
+				}
+				pHitBox = pHitBox->GetNext();
+			} while (pHitBox != NULL);
+
+		}
+	}
+	
 	
 	return false;
 }

@@ -25,6 +25,8 @@ public:
 	virtual void Draw(void);
 	bool Ray(D3DXVECTOR3 start, D3DXVECTOR3 end, D3DXVECTOR3 * pPos = NULL);
 	bool Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, bool * pLand = NULL);
+	bool CollisionX(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement);
+	bool CollisionY(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, bool * pLand = NULL);
 	bool IntersectTriangle(const D3DXVECTOR3& prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, const D3DXVECTOR3& v1, const D3DXVECTOR3& v2, const D3DXVECTOR3& v3);
 	bool IsInsideBoundingBox(D3DXVECTOR3* vertices, D3DXVECTOR3 point, D3DXVECTOR3* pMovement);
 	bool IsOnLineSegment(D3DXVECTOR3 p1, D3DXVECTOR3 p2, D3DXVECTOR3 point);

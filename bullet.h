@@ -52,7 +52,7 @@ private:
 	int m_nHomingCount; //ホーミングの管理
 	int m_nMoveCount;//軌道変更の回数
 	float m_fSpeed;
-	CObjectLight * m_pLight;
+
 };
 
 #endif // ! _BULLET_H_
