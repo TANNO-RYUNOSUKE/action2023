@@ -16,7 +16,6 @@
 
 CObject2D::CObject2D(int nPriority) : CObject(nPriority)
 {
-	m_pTexture = NULL;
 	m_pVtxBuff = NULL;
 	m_col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	m_fHeight = 0.0f;
@@ -68,11 +67,14 @@ HRESULT CObject2D::Init(void)
 	VERTEX_2D *pVtx;
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
+	Tex_min = D3DXVECTOR2(0.0f, 0.0f);
+	Tex_max = D3DXVECTOR2(1.0f, 1.0f);
+
 	//テクスチャ座標
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[0].tex = D3DXVECTOR2(Tex_min.x, Tex_min.y);
+	pVtx[1].tex = D3DXVECTOR2(Tex_max.x, Tex_min.y);
+	pVtx[2].tex = D3DXVECTOR2(Tex_min.x, Tex_max.y);
+	pVtx[3].tex = D3DXVECTOR2(Tex_max.x, Tex_max.y);
 
 
 	//頂点座標の設定
@@ -228,4 +230,44 @@ void CObject2D::Draw(void)
 	 pVtx[1].col = m_col;
 	 pVtx[2].col = m_col;
 	 pVtx[3].col = m_col;
+
+	 //テクスチャ座標
+	 pVtx[0].tex = D3DXVECTOR2(Tex_min.x, Tex_min.y);
+	 pVtx[1].tex = D3DXVECTOR2(Tex_max.x, Tex_min.y);
+	 pVtx[2].tex = D3DXVECTOR2(Tex_min.x, Tex_max.y);
+	 pVtx[3].tex = D3DXVECTOR2(Tex_max.x, Tex_max.y);
+
+	 //if (Tex_min.x < 0.0f)
+	 //{
+		// Tex_min.x += 1.0f;
+	 //}
+	 //else if(Tex_min.x > 1.0f)
+	 //{
+		// Tex_min.x -= 1.0f;
+	 //}
+	 //if (Tex_min.y < 0.0f)
+	 //{
+		// Tex_min.y += 1.0f;
+	 //}
+	 //else if (Tex_min.y > 1.0f)
+	 //{
+		// Tex_min.y -= 1.0f;
+	 //}
+
+	 //if (Tex_max.x < 0.0f)
+	 //{
+		// Tex_max.x += 1.0f;
+	 //}
+	 //else if (Tex_max.x > 1.0f)
+	 //{
+		// Tex_max.x -= 1.0f;
+	 //}
+	 //if (Tex_max.y < 0.0f)
+	 //{
+		// Tex_max.y += 1.0f;
+	 //}
+	 //else if (Tex_max.y > 1.0f)
+	 //{
+		// Tex_max.y -= 1.0f;
+	 //}
  }															

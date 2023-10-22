@@ -11,11 +11,10 @@
 #include "motion.h"
 #include "object2D.h"
 #include "objectlight.h"
+#include "ui_system_message.h"
 //マクロ定義
-#define GRAVITY (0.8f)
+#define GRAVITY (0.4f)
 
-#define MAX_LOCK (12)
-#define MAX_LANGE (20000.0f)
 //クラス定義
 class CPlayer : public CObject //オブジェクトクラスの継承
 {
@@ -74,7 +73,7 @@ public:
 	float CheckEnemyAngle(const D3DXVECTOR3& cameraDirection, const D3DXVECTOR3& enemyDirection);
 	static D3DXVECTOR3 LinePrediction(D3DXVECTOR3 shotPosition, D3DXVECTOR3 targetPosition, D3DXVECTOR3 targetPrePosition, float bulletSpeed);
 	static float PlusMin(float a, float b);
-	CModel * GetModelUp(void) { return m_apModel[0]; }
+	CModel * GetModelUp(int nData = 0) { return m_apModel[nData]; }
 	void SetState(STATE state, int nCnt) { m_state = state; m_nStateCount = nCnt; }
 private:
 	STATE m_state;
@@ -90,6 +89,7 @@ private:
 	int m_nNumModel;//使用するモデルの数
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 	CObjectLight * m_pLight;
+	
 	
 };
 

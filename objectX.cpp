@@ -11,6 +11,7 @@
 #include "texture.h"
 #include "xfile.h"
 #include "Xmanager.h"
+#include "player.h"
 #include<vector>
 
 
@@ -171,6 +172,14 @@ void CObjectX::Update(void)
 //=============================================
 void CObjectX::Draw(void)
 {
+	CPlayer * pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
+	if (pPlayer != NULL)
+	{
+		if (CManager::GetInstance()->GetDistance(pPlayer->GetPos() - GetPos()) > 1500.0f)
+		{
+			return;
+		}
+	}
 	CXFile * pXFile = CManager::GetInstance()->GetXFiles();
 	CTexture * pTex = CManager::GetInstance()->GetTexture();
 	CRenderer * pRenderer = CManager::GetInstance()->GetRenderer();

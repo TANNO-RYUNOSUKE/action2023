@@ -36,15 +36,15 @@ HRESULT CLight::Init(void)
 		switch (nCntLight)
 		{
 		case 0:
-			m_aLight[nCntLight].Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			m_aLight[nCntLight].Diffuse = D3DXCOLOR(0.9f, 1.0f, 1.0f, 1.0f);
 			vecDir = D3DXVECTOR3(-1.4f, 0.24f, -2.21f);
 			break;
 		case 1:
-			m_aLight[nCntLight].Diffuse = D3DXCOLOR(0.8f, 0.8f, 0.9f, 0.6f);
+			m_aLight[nCntLight].Diffuse = D3DXCOLOR(0.7f, 0.8f, 0.9f, 0.6f);
 			vecDir = D3DXVECTOR3(1.42f, -0.8f, 0.08f);
 			break;
 		case 2:
-			m_aLight[nCntLight].Diffuse = D3DXCOLOR(0.6f, 0.6f, 0.6f, 0.2f);
+			m_aLight[nCntLight].Diffuse = D3DXCOLOR(0.5f, 0.6f, 0.6f, 0.2f);
 			vecDir = D3DXVECTOR3(-0.59f, -0.8f, 1.55f);
 
 		default:

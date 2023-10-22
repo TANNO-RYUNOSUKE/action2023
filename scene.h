@@ -9,7 +9,7 @@
 #include "object.h"
 #include "object2D.h"
 
-
+#include "ui_system_message.h"
 //前方宣言
 class CEnemyManager; //エネミーマネージャー
 class CInputKeyboard; //キーボード
@@ -80,9 +80,17 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+	CCamera * GetCamera(void) { return m_pCamera; }
+
 private:
 	CObject2D * m_pTitle;
+	CObject2D * m_pTitleLogo;
 	D3DXVECTOR3 m_posDest;
+	CPlayer * m_pPlayer;//プレイヤーのポインタ
+	CCamera * m_pCamera;//カメラのポインタ
+	CLight * m_pLight;//ライトのポインタ
+
+
 };
 class CTutorial :public CScene
 {
@@ -135,7 +143,7 @@ public:
 private:
 	
 	 CPlayer * m_pPlayer;//プレイヤーのポインタ
-	
+	 CUI_System_Message * m_pUI;
 	 CCamera * m_pCamera;//カメラのポインタ
 	 CLight * m_pLight;//ライトのポインタ
 

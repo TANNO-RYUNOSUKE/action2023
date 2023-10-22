@@ -26,6 +26,7 @@
 #include "particle.h"
 #include "enemymanager.h"
 #include "enemy.h"
+#include "ui_system_message.h"
 
 //マクロ定義
 #define MOVE_PLAYER (2.0f)
@@ -63,6 +64,7 @@ CPlayer::~CPlayer()
 //=============================================
 HRESULT CPlayer::Init()
 {
+
 	m_pTarget = NULL;
 	m_pFilterDamage = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, SCREEN_WIDTH, 0, "data\\TEXTURE\\RedFilter.png");
 	m_pFilterDamage->SetDisp(false);
@@ -76,7 +78,7 @@ HRESULT CPlayer::Init()
 	m_pMotionUp->SetModel(&m_apModel[0]);
 
 	m_pMotionUp->Load("data\\TEXT\\motion_player.txt");
-	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f), GetPos(), 500);
+	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(0.9f, 0.9f, 1.0f, 1.0f), GetPos(), 500);
 	m_pLight->GetLight()->Falloff = 100.0f;
 	m_pLight->GetLight()->Attenuation0 = 2.0f;
 	m_pLight->GetLight()->Attenuation1 = 0.0f;
@@ -121,88 +123,110 @@ void CPlayer::Update()
 
 	m_pMotionUp->Update();
 
-
-	bool bMove = false;
-
-	
-
-
-	CCamera * pCamera = CManager::GetInstance()->GetScene()->GetCamera();
-	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
-
-
-	//注視点の座標設定
-	D3DXVECTOR3 seepos = GetPos();
-	
-	if (!CManager::GetInstance()->GetPause())
+	if (CManager::GetInstance()->GetScene()->GetMode() == CScene::MODE_GAME)
 	{
-		seepos.y += 100.0f;
-		//seepos.y += 200.0f;
-		m_pLight->SetPos(seepos);
-		pCamera->SetRDest(seepos);
-		seepos.z -= 750.0f;
-		seepos.y += 50.0f;
-		pCamera->SetVDest(seepos);
-	}
-	
+		bool bMove = false;
 
-	pDeb->Print("WASD:移動\n");
-	pDeb->Print("プレイヤーの座標(X:%f,Y:%f,Z:%f)\n", GetPos().x, GetPos().y, GetPos().z);
-	pDeb->Print("プレイヤーの移動値(X:%f,Y:%f,Z:%f)\n", GetMove().x, GetMove().y, GetMove().z);
-	pDeb->Print("ライトの数:%d\n", CManager::GetInstance()->GetLightCount());
-	//頂点座標の設定
 
-	
-	
-	SetPosOld(GetPos());//posoldの更新
-	Move();
 
-	if (pInputKeyboard->GetTrigger(DIK_LSHIFT))
-	{
-		D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43);
-		if (m_pTarget != NULL)
+
+		CCamera * pCamera = CManager::GetInstance()->GetScene()->GetCamera();
+		CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
+
+
+		//注視点の座標設定
+		D3DXVECTOR3 seepos = GetPos();
+
+		if (!CManager::GetInstance()->GetPause())
 		{
-			if (*m_pTarget)
+			seepos.y += 100.0f;
+			//seepos.y += 200.0f;
+			m_pLight->SetPos(seepos);
+			pCamera->SetRDest(seepos);
+			seepos.z -= 750.0f;
+			seepos.y += 50.0f;
+			pCamera->SetVDest(seepos);
+		}
+
+
+		pDeb->Print("WASD:移動\n");
+		pDeb->Print("プレイヤーの座標(X:%f,Y:%f,Z:%f)\n", GetPos().x, GetPos().y, GetPos().z);
+		pDeb->Print("プレイヤーの移動値(X:%f,Y:%f,Z:%f)\n", GetMove().x, GetMove().y, GetMove().z);
+		pDeb->Print("ライトの数:%d\n", CManager::GetInstance()->GetLightCount());
+		//頂点座標の設定
+
+
+
+		SetPosOld(GetPos());//posoldの更新
+		Move();
+
+		if (pInputKeyboard->GetTrigger(DIK_LSHIFT))
+		{
+			D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43);
+			if (m_pTarget != NULL)
 			{
-				D3DXVECTOR3 vec = pos - ((*m_pTarget)->GetPos() + (*m_pTarget)->GetModel()->GetPos());
-				D3DXVec3Normalize(&vec, &vec);
-				CBullet::Create(pos, -vec * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+				if (*m_pTarget)
+				{
+					D3DXVECTOR3 vec = pos - ((*m_pTarget)->GetPos() + (*m_pTarget)->GetModel()->GetPos());
+					D3DXVec3Normalize(&vec, &vec);
+					CBullet::Create(pos, -vec * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+				}
+				else
+				{
+					CBullet::Create(pos, -CBullet::AnglesToVector(GetRot()) * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+				}
 			}
 			else
 			{
 				CBullet::Create(pos, -CBullet::AnglesToVector(GetRot()) * 50.0f, 30, CBullet::TYPE_PLAYER, false);
 			}
-		}
-		else
-		{
-			CBullet::Create(pos, -CBullet::AnglesToVector(GetRot()) * 50.0f, 30, CBullet::TYPE_PLAYER, false);
-		}
-		
-	}
 
-	if (m_nLife <= 0)
-	{
-		for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
-		{
-		/*	if (m_apModelUp[nCnt] != NULL)
-			{
-				D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelUp[nCnt]->GetMatrix()._41, m_apModelUp[nCnt]->GetMatrix()._42, m_apModelUp[nCnt]->GetMatrix()._43);
-				CDebri::Create(m_apModelUp[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
-			}
-			if (m_apModelLow[nCnt] != NULL)
-			{
-				D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelLow[nCnt]->GetMatrix()._41, m_apModelLow[nCnt]->GetMatrix()._42, m_apModelLow[nCnt]->GetMatrix()._43);
-				CDebri::Create(m_apModelLow[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
-			}*/
 		}
-		// CGame::SetPlayer(NULL);
-		
-		Release();
-	}
-	m_nStateCount--;
-	if (m_nStateCount <= 0)
-	{
-		m_nStateCount = 0;
+
+		if (m_nLife <= 0)
+		{
+			for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
+			{
+				/*	if (m_apModelUp[nCnt] != NULL)
+					{
+						D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelUp[nCnt]->GetMatrix()._41, m_apModelUp[nCnt]->GetMatrix()._42, m_apModelUp[nCnt]->GetMatrix()._43);
+						CDebri::Create(m_apModelUp[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
+					}
+					if (m_apModelLow[nCnt] != NULL)
+					{
+						D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelLow[nCnt]->GetMatrix()._41, m_apModelLow[nCnt]->GetMatrix()._42, m_apModelLow[nCnt]->GetMatrix()._43);
+						CDebri::Create(m_apModelLow[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
+					}*/
+			}
+			// CGame::SetPlayer(NULL);
+
+			Release();
+		}
+		m_nStateCount--;
+		if (m_nStateCount <= 0)
+		{
+			m_nStateCount = 0;
+			switch (m_state)
+			{
+			case CPlayer::STATE_NONE:
+				break;
+			case CPlayer::STATE_NEUTRAL:
+				break;
+			case CPlayer::STATE_DASH:
+				SetState(STATE_HOVER, 60);
+				break;
+			case CPlayer::STATE_HOVER:
+				m_state = STATE_NEUTRAL;
+				break;
+			case CPlayer::STATE_MAX:
+				break;
+			default:
+				assert(false);
+				break;
+			}
+		}
+		CEnemy ** pEnemy = CManager::GetInstance()->GetEnemyManager()->GetEnemy();
+		D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[0]->GetMatrix()._41, m_apModel[0]->GetMatrix()._42, m_apModel[0]->GetMatrix()._43);
 		switch (m_state)
 		{
 		case CPlayer::STATE_NONE:
@@ -210,31 +234,10 @@ void CPlayer::Update()
 		case CPlayer::STATE_NEUTRAL:
 			break;
 		case CPlayer::STATE_DASH:
-			SetState(STATE_HOVER, 60);
-			break;
-		case CPlayer::STATE_HOVER:
-			m_state = STATE_NEUTRAL;
-			break;
-		case CPlayer::STATE_MAX:
-			break;
-		default:
-			assert(false);
-			break;
-		}
-	}
-	CEnemy ** pEnemy = CManager::GetInstance()->GetEnemyManager()->GetEnemy();
-	D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[0]->GetMatrix()._41, m_apModel[0]->GetMatrix()._42, m_apModel[0]->GetMatrix()._43);
-	switch (m_state)
-	{
-	case CPlayer::STATE_NONE:
-		break;
-	case CPlayer::STATE_NEUTRAL:
-		break;
-	case CPlayer::STATE_DASH:
-		
-		for (int i = 0; i < NUM_ENEMY; i++, pEnemy++)
-		{
-			
+
+			for (int i = 0; i < NUM_ENEMY; i++, pEnemy++)
+			{
+
 				if (*pEnemy != NULL)
 				{
 					CModel * pModel = (*pEnemy)->GetModel();
@@ -263,16 +266,17 @@ void CPlayer::Update()
 					} while (pHitBox != NULL);
 
 				}
-			
+
+			}
+			break;
+		case CPlayer::STATE_HOVER:
+			break;
+		case CPlayer::STATE_MAX:
+			break;
+		default:
+			assert(false);
+			break;
 		}
-		break;
-	case CPlayer::STATE_HOVER:
-		break;
-	case CPlayer::STATE_MAX:
-		break;
-	default:
-		assert(false);
-		break;
 	}
 }
 //=============================================

@@ -13,7 +13,7 @@
 class CEffect : public CBillboard //オブジェクトクラスの継承
 {
 public:
-	CEffect(int nPriority = 1);
+	CEffect(int nPriority = 6);
 
 	~CEffect();
 

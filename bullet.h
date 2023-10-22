@@ -13,7 +13,7 @@
 class CBullet : public CBillboard //オブジェクトクラスの継承
 {
 public:
-	CBullet(int nPriority = 2);
+	CBullet(int nPriority = 6);
 	CBullet(D3DXVECTOR3 pos,D3DXVECTOR3 move,int nLife);
 	~CBullet();
 	enum TYPE

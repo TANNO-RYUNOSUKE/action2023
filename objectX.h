@@ -15,7 +15,7 @@ class CObjectX : public CObject //オブジェクトクラスの継承
 {
 public:
 
-	CObjectX(int nPriority = 3);
+	CObjectX(int nPriority = 1);
 
 	~CObjectX();
 

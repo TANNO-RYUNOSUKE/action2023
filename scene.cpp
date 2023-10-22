@@ -91,10 +91,28 @@ CTitle::~CTitle()
 //=============================================
 HRESULT CTitle::Init()
 {
+	m_pLight = DBG_NEW CLight;
+	m_pLight->Init();
+	m_pCamera = DBG_NEW CCamera;
+	m_pCamera->Init();
+	m_pPlayer = CPlayer::Create();
+	for (int i = 0; i < 3; i++)
+	{
+		CObjectX::Create("data\\MODEL\\corridor_ceiling.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
+		CObjectX::Create("data\\MODEL\\corridor_wall.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
+		CObjectX::Create("data\\MODEL\\corridor_floor.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
+	}
+
+	D3DXVECTOR3 pos ={-100.0f,100.0f,0.0f};
+
+	m_pCamera->SetRDest(pos);
+	pos.z -= 30.0f;
+	pos.y += 50.0f;
+	m_pCamera->SetVDest(pos);
 	m_pFade = DBG_NEW CFade;
 	m_pFade->Init();
-	CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH /2, SCREEN_HEIGHT/2, 0.0f),SCREEN_HEIGHT,SCREEN_WIDTH,0, "data\\TEXTURE\\TITLE\\lab1.png");
-	m_pTitle = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f), 305.0f, 600.0f, 0, "data\\TEXTURE\\TITLE\\lab2.png");
+	m_pTitleLogo = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH /2, SCREEN_HEIGHT/2, 0.0f),68,646,6, "data\\TEXTURE\\UI\\IronShadow.png");
+	m_pTitle = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, 280.0f, 6, "data\\TEXTURE\\UI\\IS_UI_boot.png");
 	m_posDest = D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f);
 	CSound * pSound = CManager::GetInstance()->GetSound();
 
@@ -106,20 +124,49 @@ HRESULT CTitle::Init()
 //=============================================
 void CTitle::Uninit()
 {
-
+	if (m_pCamera != NULL)
+	{
+		//メモリ解放
+		m_pCamera->Uninit();
+		delete m_pCamera;
+		m_pCamera = NULL;
+	}
+	if (m_pLight != NULL)
+	{
+		//メモリ解放
+		m_pLight->Uninit();
+		delete m_pLight;
+		m_pLight = NULL;
+	}
 }
 //=============================================
 //更新関数
 //=============================================
 void CTitle::Update()
-{
-	
-	m_pTitle->SetPos(m_pTitle->GetPos() + (m_posDest - m_pTitle->GetPos()) / 120);
-	if (CManager::GetInstance()->GetDistance((m_pTitle->GetPos() - m_posDest)) <= 10.0f)
+{ 
+	m_pLight->Update();
+	m_pCamera->Update();
+
+	D3DXVECTOR3 pos{-100.0f,150.0f,0.0f };;
+	pos.z -= 250.0f;
+	m_pCamera->SetVDest(m_pCamera->GetPosV()+ (pos -m_pCamera->GetPosV()  ) * 0.01f);
+	if (rand()% 15 == 0)
 	{
-		m_posDest = D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f);
-	
-		m_posDest.x += rand() % 100 - 50;
+		m_pTitle->SetTexMin(D3DXVECTOR2(m_pTitle->GetTexMin().x, m_pTitle->GetTexMin().y + 0.02f));
+		m_pTitle->SetTexMax(D3DXVECTOR2(m_pTitle->GetTexMax().x, m_pTitle->GetTexMax().y + 0.02f));
+
+	}
+	if (rand() % 120 == 0)
+	{
+		
+		m_pTitleLogo->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+
+
+	}
+	else 
+	{
+		m_pTitleLogo->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		
 	}
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
@@ -157,7 +204,7 @@ HRESULT CTutorial::Init()
 {
 	m_pFade = DBG_NEW CFade;
 	m_pFade->Init();
-
+	
 	CSound * pSound = CManager::GetInstance()->GetSound();
 
 	return S_OK;
@@ -203,7 +250,8 @@ CGame::~CGame()
 //=============================================
 HRESULT CGame::Init()
 {
-	
+	m_pUI = DBG_NEW CUI_System_Message;
+	m_pUI->Init();
 	b_Pause = false;
 	m_nCnt = 0;
 	m_pFade = DBG_NEW CFade;
@@ -211,9 +259,7 @@ HRESULT CGame::Init()
 	m_pCamera = DBG_NEW CCamera;
 	m_pLight = DBG_NEW CLight;
 	m_pPlayer = CPlayer::Create();
-	CEnemy_Walker::Create(D3DXVECTOR3(3000.0f, -2000.0f, 0.0f), 10);
-	CEnemy_Walker::Create(D3DXVECTOR3(3100.0f, -2000.0f, 0.0f), 10);
-	CEnemy_Walker::Create(D3DXVECTOR3(3200.0f, -2000.0f, 0.0f), 10);
+	
 	CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", m_pPlayer);
 	//初期化設定;
 	
@@ -258,7 +304,11 @@ void CGame::Uninit()
 	}
 
 
-
+	if (m_pUI != NULL)
+	{
+		delete m_pUI;
+		m_pUI = NULL;
+	}
 }
 //=============================================
 //更新関数
@@ -268,6 +318,7 @@ void CGame::Update()
 	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 	m_nCnt++;
 
+	m_pUI->Update();
 	m_pCamera->Update();
 	m_pLight->Update();
 

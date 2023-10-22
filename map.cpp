@@ -53,17 +53,20 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 	{
 		for (int j = 0; j < c_nObjectY; j++)
 		{
-			D3DXVECTOR3 pos{ 250.0f*i,-250.0f*j, 0 };
+			D3DXVECTOR3 pos{ 550.0f*i,-400.0f*j, 0 };
 			switch (nMapID[i + j * c_nObjectX])
 			{
 			case -1://空白
 			case 0://空白
 				break;
 			case 1://プレイヤー
-				
+				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
 				if (pPlayer != NULL)
 				{
-					
+					pos.y += 100.0f;
+				
 					pPlayer->SetPos(pos);
 				}
 				else
@@ -72,13 +75,27 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				}
 				break;
 			case 2://通常ブロック
-				CObjectX::Create("data\\MODEL\\floor.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
 				break;
-			case 3://入口
-				
-				break;
-			case 4://出口
+			case 3://上空き
 			
+				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
+				break;
+			case 4://下空き
+				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+			
+				break;
+			case 5://吹き抜け
+				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+				break;
+			case 6://立ち入り禁止
+				CObjectX::Create("data\\MODEL\\corridor_block.x", pos);
+				break;
+			case 7://出口
 				break;
 			default:
 				assert(false);

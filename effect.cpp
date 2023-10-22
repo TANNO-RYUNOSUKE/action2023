@@ -131,7 +131,7 @@ void CEffect::Draw()
 CEffect * CEffect::Create(D3DXVECTOR3 pos, D3DXVECTOR3 move, int nLife, D3DXCOLOR col, float fsize, float fAttenuation, char * pName)
 {
 	CEffect * pEffect = NULL;
-	pEffect = DBG_NEW CEffect;
+	pEffect = DBG_NEW CEffect(6);
 
 	pEffect->m_Color = col;
 	pEffect->SetPos(pos);

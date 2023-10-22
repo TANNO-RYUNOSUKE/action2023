@@ -32,20 +32,26 @@ public:
 	void SetVtx(VERTEX_2D  * pVtx);
 
 	CObject2D * Get2D() { return this; }
-	LPDIRECT3DTEXTURE9 * GetTex() { return &m_pTexture; }
+
 	LPDIRECT3DVERTEXBUFFER9 * GetBuff() { return &m_pVtxBuff; }
 
 	D3DXCOLOR GetCol(void) { return m_col; }
 	void SetCol(D3DXCOLOR col) { m_col = col; }
 	void SetDisp(bool bDisp) { m_bDisp = bDisp; }
 	void SetLife(int nLife) { m_nLife = nLife; }
+	D3DXVECTOR2 GetTexMin(void) { return Tex_min; }
+	D3DXVECTOR2 GetTexMax(void) { return Tex_max; }
+	void SetTexMin(D3DXVECTOR2 pos) { Tex_min = pos; }
+	void SetTexMax(D3DXVECTOR2 pos) { Tex_max = pos; }
 protected:
 	//ポリゴン表示用
-	LPDIRECT3DTEXTURE9 m_pTexture;	//テクスチャへのポインタ
+
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;		//頂点バッファ
 private:
 	float m_fHeight;	//高さ
 	float m_fWidth;	//幅
+	D3DXVECTOR2 Tex_min;
+	D3DXVECTOR2 Tex_max;
 	D3DXCOLOR m_col;//色
 	char * m_pFileName;//名前
 	bool m_bDisp;

@@ -24,7 +24,7 @@ private:
 };
 
 const float c_fObjectMinSize = 250.0f;
-const int c_nObjectX = 50;
-const int c_nObjectY = 20;
+const int c_nObjectX = 17;
+const int c_nObjectY = 10;
 
 #endif // ! _Map_H_
