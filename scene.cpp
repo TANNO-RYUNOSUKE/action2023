@@ -102,21 +102,23 @@ HRESULT CTitle::Init()
 		CObjectX::Create("data\\MODEL\\corridor_wall.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
 		CObjectX::Create("data\\MODEL\\corridor_floor.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
 	}
-
+	m_posDest = { -100.0f,150.0f, -250.0f };
 	D3DXVECTOR3 pos ={-100.0f,100.0f,0.0f};
-
+	m_pCamera->SetPosR(pos);
+	
 	m_pCamera->SetRDest(pos);
 	pos.z -= 30.0f;
 	pos.y += 50.0f;
+	m_pCamera->SetPosV(pos);
 	m_pCamera->SetVDest(pos);
 	m_pFade = DBG_NEW CFade;
 	m_pFade->Init();
-	m_pTitleLogo = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH /2, SCREEN_HEIGHT/2, 0.0f),68,646,6, "data\\TEXTURE\\UI\\IronShadow.png");
-	m_pTitle = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, 280.0f, 6, "data\\TEXTURE\\UI\\IS_UI_boot.png");
-	m_posDest = D3DXVECTOR3(SCREEN_WIDTH * 0.3f, SCREEN_HEIGHT * 0.7f, 0.0f);
+	m_pTitleLogo = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH /2 + 20.0f, SCREEN_HEIGHT/2, 0.0f),68,646,6, "data\\TEXTURE\\UI\\IronShadow.png");
+	m_pTitle = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH * 0.15f, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, 280.0f, 6, "data\\TEXTURE\\UI\\IS_UI_boot.png");
+	
 	CSound * pSound = CManager::GetInstance()->GetSound();
 
-	//pSound->Play(CSound::SOUND_LABEL_BGM000);
+	pSound->Play(CSound::SOUND_LABEL_BGM000);
 	return S_OK;
 }
 //=============================================
@@ -147,9 +149,15 @@ void CTitle::Update()
 	m_pLight->Update();
 	m_pCamera->Update();
 
-	D3DXVECTOR3 pos{-100.0f,150.0f,0.0f };;
-	pos.z -= 250.0f;
-	m_pCamera->SetVDest(m_pCamera->GetPosV()+ (pos -m_pCamera->GetPosV()  ) * 0.01f);
+
+	
+	m_pCamera->SetVDest(m_pCamera->GetPosV()+ (m_posDest -m_pCamera->GetPosV()  ) * 0.01f);
+	if (CManager::GetInstance()->GetDistance(m_posDest - m_pCamera->GetPosV()) < 10.0f)
+	{
+		m_posDest.x = -100.0f +(rand() % 1000 - 500) * 0.1f;
+		m_posDest.y = 150.0f + (rand() % 500 - 250) * 0.1f;
+	}
+
 	if (rand()% 15 == 0)
 	{
 		m_pTitle->SetTexMin(D3DXVECTOR2(m_pTitle->GetTexMin().x, m_pTitle->GetTexMin().y + 0.02f));
@@ -259,8 +267,10 @@ HRESULT CGame::Init()
 	m_pCamera = DBG_NEW CCamera;
 	m_pLight = DBG_NEW CLight;
 	m_pPlayer = CPlayer::Create();
-	
-	CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", m_pPlayer);
+	m_pTimer = m_pTimer->Create();
+
+	CEnemy_Walker::Create(D3DXVECTOR3(6000.0f, -2500.0f, 0.0f), 10);
+	CMap::Load("data\\TEXT\\map\\map_01_Rooms.csv", m_pPlayer);
 	//‰Šú‰»Ý’è;
 	
 	if (FAILED(m_pCamera->Init()))
@@ -276,7 +286,7 @@ HRESULT CGame::Init()
 
 
 	CSound * pSound = CManager::GetInstance()->GetSound();
-	//pSound->Play(CSound::SOUND_LABEL_BGM001);
+	pSound->Play(CSound::SOUND_LABEL_BGM001);
 
 
 	return S_OK;
@@ -303,6 +313,13 @@ void CGame::Uninit()
 		m_pLight = NULL;
 	}
 
+	if (m_pTimer != NULL)
+	{
+		//ƒƒ‚ƒŠ‰ð•ú
+		m_pTimer->Uninit();
+		delete m_pTimer;
+		m_pTimer = NULL;
+	}
 
 	if (m_pUI != NULL)
 	{
@@ -317,7 +334,7 @@ void CGame::Update()
 {
 	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 	m_nCnt++;
-
+	m_pTimer->Update();
 	m_pUI->Update();
 	m_pCamera->Update();
 	m_pLight->Update();

@@ -17583,7 +17583,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.500000;0.500000;0.500000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\3d\\eye.png";
+    "data\\TEXTURE\\eye.png";
    }
   }
   Material {
@@ -17592,7 +17592,7 @@ Mesh {
    0.120000;0.120000;0.120000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\3d\\hare.png";
+    "data\\TEXTURE\\hare.png";
    }
   }
   Material {

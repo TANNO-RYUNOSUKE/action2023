@@ -175,7 +175,7 @@ void CObjectX::Draw(void)
 	CPlayer * pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
 	if (pPlayer != NULL)
 	{
-		if (CManager::GetInstance()->GetDistance(pPlayer->GetPos() - GetPos()) > 1500.0f)
+		if (CManager::GetInstance()->GetDistance(pPlayer->GetPos() - GetPos()) > 2000.0f)
 		{
 			return;
 		}
@@ -237,11 +237,11 @@ void CObjectX::Draw(void)
 //=============================================
 //“–‚½‚è”»’è
 //=============================================
-bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement,bool * pLand)
+bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, float fHeigt, float fWidth, bool * pLand, bool * pX, bool * pY)
 {
 	
 	*pCurrentPosition += *pMovement;
-			if (pCurrentPosition->x > GetPos().x + m_vtxMinModel.x  && pCurrentPosition->x < GetPos().x + m_vtxMaxModel.x  && pCurrentPosition->z > GetPos().z + m_vtxMinModel.z  && pCurrentPosition->z < GetPos().z + m_vtxMaxModel.z && pCurrentPosition->y > GetPos().y + m_vtxMinModel.y  && pCurrentPosition->y < GetPos().y + m_vtxMaxModel.y)
+			if (pCurrentPosition->x > GetPos().x + m_vtxMinModel.x - fWidth *0.5f  && pCurrentPosition->x < GetPos().x + m_vtxMaxModel.x + fWidth *0.5f  && pCurrentPosition->z > GetPos().z + m_vtxMinModel.z  && pCurrentPosition->z < GetPos().z + m_vtxMaxModel.z && pCurrentPosition->y > GetPos().y + m_vtxMinModel.y - fHeigt  && pCurrentPosition->y < GetPos().y + m_vtxMaxModel.y)
 			{
 			
 
@@ -251,7 +251,10 @@ bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition
 					{
 						*pLand = true;
 					}
-				
+					if (pY != NULL)
+					{
+						*pY = true;
+					}
 					pCurrentPosition->y = GetPos().y + +m_vtxMaxModel.y;
 					pMovement->y = 0.0f;
 				}
@@ -266,21 +269,33 @@ bool CObjectX::Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition
 				{
 					pCurrentPosition->x = GetPos().x + m_vtxMinModel.x;
 					pMovement->x = 0.0f;
+					if (pX != NULL)
+					{
+						*pX = true;
+					}
 				}
 				else if (prevPosition.x >= GetPos().x + m_vtxMaxModel.x && pCurrentPosition->x < GetPos().x + m_vtxMaxModel.x)
 				{
 					pCurrentPosition->x = GetPos().x + +m_vtxMaxModel.x;
 					pMovement->x = 0.0f;
+					if (pX != NULL)
+					{
+						*pX = true;
+					}
 				}
 				else if (prevPosition.z >= GetPos().z + m_vtxMaxModel.z && pCurrentPosition->z < GetPos().z + m_vtxMaxModel.z)
 				{
 					pCurrentPosition->z = GetPos().z + +m_vtxMaxModel.z;
 					pMovement->z = 0.0f;
 				}
-				else if (prevPosition.y <= (GetPos().y + m_vtxMinModel.y) && pCurrentPosition->y >(GetPos().y + m_vtxMinModel.y))
+				else if (prevPosition.y <= (GetPos().y + m_vtxMinModel.y - fHeigt) && pCurrentPosition->y >(GetPos().y + m_vtxMinModel.y - fHeigt))
 				{
-					pCurrentPosition->y = GetPos().y + m_vtxMinModel.y;
+					pCurrentPosition->y = GetPos().y + m_vtxMinModel.y - fHeigt;
 					pMovement->y = 0.0f;
+					if (pY != NULL)
+					{
+						*pY = true;
+					}
 				}
 				*pCurrentPosition -= *pMovement;
 				return true;

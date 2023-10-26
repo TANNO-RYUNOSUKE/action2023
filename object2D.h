@@ -43,6 +43,7 @@ public:
 	D3DXVECTOR2 GetTexMax(void) { return Tex_max; }
 	void SetTexMin(D3DXVECTOR2 pos) { Tex_min = pos; }
 	void SetTexMax(D3DXVECTOR2 pos) { Tex_max = pos; }
+	void SetName(char * pName) { m_pFileName = pName; }
 protected:
 	//ƒ|ƒŠƒSƒ“•\Ž¦—p
 

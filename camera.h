@@ -31,6 +31,8 @@ public:
 	D3DXVECTOR3 GetVec(void) { return m_vecCamera; }
 	D3DXVECTOR3 GetPosV(void) { return m_posV; }
 	D3DXVECTOR3 GetPosR(void) { return m_posR; }
+	void SetPosV(D3DXVECTOR3 pos) {  m_posV = pos; }
+	void SetPosR(D3DXVECTOR3 pos) {  m_posR = pos; }
 private:
 	D3DXVECTOR3 m_posV;			//éãì_
 	D3DXVECTOR3 m_posR;			//íçéãì_

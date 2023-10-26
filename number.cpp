@@ -43,7 +43,7 @@ HRESULT CNumber::Init(void)
 		m_pObbject = CObject2D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 6, "data\\TEXTURE\\number003.png");
 		break;
 	default:
-		m_pObbject = CObject2D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 6, "data\\TEXTURE\\number002.png");
+		m_pObbject = CObject2D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 6, "data\\TEXTURE\\number005.png");
 		break;
 	}
 
@@ -82,10 +82,9 @@ void CNumber::Update(void)
 	VERTEX_2D * pVtx;
 	(*pVtxBuff)->Lock(0, 0, (void**)&pVtx, 0);
 	//’¸“_À•W‚ÌÝ’è
-	pVtx[0].tex = D3DXVECTOR2((0.1f * m_ndata), 0.0f);
-	pVtx[1].tex = D3DXVECTOR2((0.1f * m_ndata) + 0.1f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2((0.1f * m_ndata), 1.0f);
-	pVtx[3].tex = D3DXVECTOR2((0.1f * m_ndata) + 0.1f, 1.0f);	
+	m_pObbject->SetTexMin(D3DXVECTOR2((0.1f * m_ndata), 0.0f));
+	m_pObbject->SetTexMax(D3DXVECTOR2((0.1f * m_ndata) + 0.1f, 1.0f));
+
 	m_pObbject->SetVtx(pVtx);
 
 	(*pVtxBuff)->Unlock();

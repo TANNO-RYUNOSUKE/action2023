@@ -145,6 +145,7 @@
     <ClInclude Include="enemy.h" />
     <ClInclude Include="enemymanager.h" />
     <ClInclude Include="fade.h" />
+    <ClInclude Include="gate_UI.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="main.h" />
@@ -157,6 +158,7 @@
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
     <ClInclude Include="objectX.h" />
+    <ClInclude Include="orbit.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="objectlight.h" />
@@ -165,6 +167,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="timer.h" />
     <ClInclude Include="ui_system_message.h" />
     <ClInclude Include="xfile.h" />
     <ClInclude Include="Xmanager.h" />
@@ -178,6 +181,7 @@
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="enemymanager.cpp" />
     <ClCompile Include="fade.cpp" />
+    <ClCompile Include="gate_UI.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -191,6 +195,7 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectlight.cpp" />
     <ClCompile Include="objectX.cpp" />
+    <ClCompile Include="orbit.cpp" />
     <ClCompile Include="particle.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="renderer.cpp" />
@@ -198,37 +203,36 @@
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="ui_system_message.cpp" />
     <ClCompile Include="xfile.cpp" />
     <ClCompile Include="Xmanager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="BloomEffect.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    <FxCompile Include="data\SHADER\BloomEffect.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="dot.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    <FxCompile Include="data\SHADER\BrightCheck.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="Gauss.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    <FxCompile Include="data\SHADER\dot.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="data\SHADER\DownSample.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="data\SHADER\Gauss.fx">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="linear.fx">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="DownSample.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </Text>
-    <Text Include="BrightCheck.fx">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

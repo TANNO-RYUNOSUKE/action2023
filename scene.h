@@ -10,6 +10,7 @@
 #include "object2D.h"
 
 #include "ui_system_message.h"
+#include "timer.h"
 //前方宣言
 class CEnemyManager; //エネミーマネージャー
 class CInputKeyboard; //キーボード
@@ -146,7 +147,7 @@ private:
 	 CUI_System_Message * m_pUI;
 	 CCamera * m_pCamera;//カメラのポインタ
 	 CLight * m_pLight;//ライトのポインタ
-
+	 CTimer * m_pTimer;
 
 	int m_nCnt;
 	bool b_Pause;//ポーズ

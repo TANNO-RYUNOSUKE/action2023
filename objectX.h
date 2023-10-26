@@ -24,7 +24,7 @@ public:
 	virtual void Update(void);
 	virtual void Draw(void);
 	bool Ray(D3DXVECTOR3 start, D3DXVECTOR3 end, D3DXVECTOR3 * pPos = NULL);
-	bool Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, bool * pLand = NULL);
+	bool Collision(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement,  float fHeigt, float fWidth, bool * pLand = NULL, bool * pX = NULL, bool * pY = NULL);
 	bool CollisionX(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement);
 	bool CollisionY(D3DXVECTOR3 prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, bool * pLand = NULL);
 	bool IntersectTriangle(const D3DXVECTOR3& prevPosition, D3DXVECTOR3* pCurrentPosition, D3DXVECTOR3* pMovement, const D3DXVECTOR3& v1, const D3DXVECTOR3& v2, const D3DXVECTOR3& v3);

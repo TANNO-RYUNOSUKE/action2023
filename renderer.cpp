@@ -164,11 +164,11 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 		&pBloomTexture,  // テクスチャ オブジェクト
 		NULL);
 
-	Loadshader("BrightCheck.fx", &pEffectBrightCheck);
-	Loadshader("DownSample.fx", &pEffectDownSample);
-	Loadshader("BloomEffect.fx", &pEffect);
-	Loadshader("dot.fx", &pEffectdot);
-	Loadshader("Gauss.fx", &pEffectLinear);
+	Loadshader("data\\SHADER\\BrightCheck.fx", &pEffectBrightCheck);
+	Loadshader("data\\SHADER\\DownSample.fx", &pEffectDownSample);
+	Loadshader("data\\SHADER\\BloomEffect.fx", &pEffect);
+	Loadshader("data\\SHADER\\dot.fx", &pEffectdot);
+	Loadshader("data\\SHADER\\Gauss.fx", &pEffectLinear);
 
 
 

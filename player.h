@@ -12,6 +12,8 @@
 #include "object2D.h"
 #include "objectlight.h"
 #include "ui_system_message.h"
+#include "orbit.h"
+
 //マクロ定義
 #define GRAVITY (0.4f)
 
@@ -75,6 +77,7 @@ public:
 	static float PlusMin(float a, float b);
 	CModel * GetModelUp(int nData = 0) { return m_apModel[nData]; }
 	void SetState(STATE state, int nCnt) { m_state = state; m_nStateCount = nCnt; }
+	
 private:
 	STATE m_state;
 	int m_nStateCount;
@@ -89,7 +92,7 @@ private:
 	int m_nNumModel;//使用するモデルの数
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 	CObjectLight * m_pLight;
-	
+	COrbit * m_pOrbit;
 	
 };
 

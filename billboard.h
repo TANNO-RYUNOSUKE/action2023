@@ -28,21 +28,30 @@ public:
 
 	static CBillboard * Create(float fHeight, float fWidth, D3DXVECTOR3 pos,char * pName = NULL);
 
-	
+	D3DXVECTOR2 GetTexMin(void) { return Tex_min; }
+	D3DXVECTOR2 GetTexMax(void) { return Tex_max; }
+	void SetTexMin(D3DXVECTOR2 pos) { Tex_min = pos; }
+	void SetTexMax(D3DXVECTOR2 pos) { Tex_max = pos; }
 	CBillboard * Get2D() { return this; }
 
 	LPDIRECT3DVERTEXBUFFER9 * GetBuff() { return &m_pVtxBuff; }
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }
 	void SetColor(D3DXCOLOR col) { m_Cclor = col; }
+	void SetName(char * pName) { m_pName = pName; }
+
+	
 protected:
 	//ポリゴン表示用
 	
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;		//頂点バッファ
 private:
+	char * m_pName;
 	float m_fHeight;	//高さ
 	float m_fWidth;	//幅
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 	D3DXCOLOR m_Cclor; //色
+	D3DXVECTOR2 Tex_min;
+	D3DXVECTOR2 Tex_max;
 
 };
 

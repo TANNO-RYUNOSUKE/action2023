@@ -30,7 +30,7 @@
 
 //マクロ定義
 #define MOVE_PLAYER (2.0f)
-#define DASH_PLAYER (30.0f)
+#define DASH_PLAYER (27.5f)
 #define JUMP_PLAYER (20.0f)
 //=============================================
 //コンストラクタ
@@ -72,13 +72,13 @@ HRESULT CPlayer::Init()
 	m_nLife = 10;
 
 	
-	
+	m_pOrbit = COrbit::Create(1.0f, 32, D3DXCOLOR(1.0f, 0.6f, 0.0f, 1.0f), GetPos());
 
 	m_pMotionUp = DBG_NEW CMotion;
 	m_pMotionUp->SetModel(&m_apModel[0]);
 
 	m_pMotionUp->Load("data\\TEXT\\motion_player.txt");
-	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(0.9f, 0.9f, 1.0f, 1.0f), GetPos(), 500);
+	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(0.4f, 0.4f, 0.5f, 1.0f), GetPos(), 500);
 	m_pLight->GetLight()->Falloff = 100.0f;
 	m_pLight->GetLight()->Attenuation0 = 2.0f;
 	m_pLight->GetLight()->Attenuation1 = 0.0f;
@@ -115,7 +115,8 @@ void CPlayer::Uninit()
 //=============================================
 void CPlayer::Update()
 {
-	
+	m_pOrbit->SetOffset(D3DXVECTOR3(m_apModel[0]->GetMatrix()._41, m_apModel[0]->GetMatrix()._42, m_apModel[0]->GetMatrix()._43), D3DXVECTOR3(m_apModel[2]->GetMatrix()._41, m_apModel[2]->GetMatrix()._42, m_apModel[2]->GetMatrix()._43));
+	m_pOrbit->Draw();
 	CSound * pSound = CManager::GetInstance()->GetSound();
 	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
@@ -394,7 +395,7 @@ void CPlayer::Move()
 		D3DXVECTOR3 vec{ 0.0f,0.0f, 0.0f };
 		if (pInputKeyboard->GetPress(DIK_W))
 		{
-			vec.y += 0.5f;
+			vec.y += 0.75f;
 		}
 		if (pInputKeyboard->GetPress(DIK_A))
 		{
@@ -402,7 +403,7 @@ void CPlayer::Move()
 		}
 		if (pInputKeyboard->GetPress(DIK_S))
 		{
-			vec.y -= 0.5f;
+			vec.y -= 0.75f;
 		}
 		if (pInputKeyboard->GetPress(DIK_D))
 		{
@@ -449,7 +450,7 @@ void CPlayer::Move()
 		move.z *= 0.9f;//原則係数
 		break;
 	case CPlayer::STATE_DASH:
-		CParticle::Create(D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43), D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f), 1, 12, 10.0f, 20, 6, 1.01f);
+		CParticle::Create(D3DXVECTOR3(m_apModel[1]->GetMatrix()._41, m_apModel[1]->GetMatrix()._42, m_apModel[1]->GetMatrix()._43), D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f), 1, 12, 10.0f, 20, 6, 1.01f);
 		move.x *= 0.99f;//原則係数
 		move.z *= 0.99f;//原則係数
 		break;
@@ -471,6 +472,7 @@ void CPlayer::Move()
 	{
 	
 	}
+
 	SetPos(pos + move);
 	SetRot(rot);
 	SetMove(move);
@@ -478,12 +480,18 @@ void CPlayer::Move()
 	CXManager * pManger = CManager::GetInstance()->GetXManager();
 	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
 	m_bLand = false;
-
+	bool bX = false;
+	bool bY = false;
 	for (int i = 0; i < NUM_OBJECTX; i++)
 	{
 		if (*(pObjectX + i) != NULL)
 		{
-			if (pObjectX[i]->Collision(GetPosOld(), GetPosAddress(), GetMoveAddress(),&m_bLand))
+			if (m_state == STATE_DASH)
+			{
+				D3DXVECTOR3 move = GetMove();
+				pObjectX[i]->Collision(GetPosOld(), GetPosAddress(), &move, 150.0f, 0.0f, &m_bLand, &bX, &bY);
+			}
+			else if (pObjectX[i]->Collision(GetPosOld(), GetPosAddress(), GetMoveAddress(), 150.0f, 0.0f, &m_bLand))
 			{
 				if (m_state == STATE_HOVER)
 				{
@@ -492,6 +500,23 @@ void CPlayer::Move()
 			}
 		}
 	}
+
+	if (bX)
+	{
+		D3DXVECTOR3 move = D3DXVECTOR3(GetMove().x * -1.0f, GetMove().y, GetMove().z);
+		D3DXVec3Normalize(&move, &move);
+		SetMove(move * DASH_PLAYER);
+	
+	}
+
+	if (bY)
+	{
+		D3DXVECTOR3 move = D3DXVECTOR3(GetMove().x, GetMove().y * -1.0f, GetMove().z);
+		D3DXVec3Normalize(&move, &move);
+		SetMove(move * DASH_PLAYER);
+		
+	}
+
     CItemManager * pItemmanager = CManager::GetInstance()->GetItemManager();
 }
 D3DXVECTOR3 CPlayer::LinePrediction(D3DXVECTOR3 shotPosition, D3DXVECTOR3 targetPosition, D3DXVECTOR3 targetPrePosition, float bulletSpeed)

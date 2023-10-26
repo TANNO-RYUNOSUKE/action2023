@@ -24,9 +24,8 @@ HRESULT ReadChunkdata(HANDLE hFile, void *pBuffer, DWORD dwBuffersize, DWORD dwB
 // ÉTÉEÉìÉhÇÃèÓïÒ
 SOUNDINFO g_aSoundInfo[CSound::SOUND_LABEL_MAX] =
 {
-	{"data/BGM/Meteorite.wav", -1},		// BGM0
-	{"data/BGM/battle1.wav", -1},		// BGM1
-	{ "data/BGM/RAIN_&amp_Co_II.wav", -1 },		// BGM2
+	{"data/BGM/Deep_sea.wav", -1},		// BGM0
+	{"data/BGM/Deep_forest.wav", -1},		// BGM1
 	{"data/SE/shot.wav", 0},			// íeî≠éÀâπ
 	{"data/SE/explosion.wav", 0},	// îöî≠âπ
 	{ "data/SE/missile.wav", 0 },	

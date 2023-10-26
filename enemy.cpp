@@ -19,11 +19,11 @@
 
 #include "sound.h"
 #include "objectX.h"
-
+#include "bullet.h"
 #include "camera.h"
 #include "Xmanager.h"
 #include "xfile.h"
-#define ENEMY_MOVE (0.6f)
+#define ENEMY_MOVE (0.2f)
 #define ENEMY_ACT (2.0f)
 //==============================
 //コンストラクタ,デストラクタ
@@ -236,7 +236,7 @@ void CEnemy::Update()
 	{
 		if (*(pObjectX + i) != NULL)
 		{
-			pObjectX[i]->Collision(posOld, GetPosAddress(), GetMoveAddress());
+			pObjectX[i]->Collision(posOld, GetPosAddress(), GetMoveAddress(), 200.0f, 100.0f);
 		}
 	}
 
@@ -324,13 +324,14 @@ CEnemy_Walker::~CEnemy_Walker()
 HRESULT CEnemy_Walker::Init()
 {
 	CEnemy::Init();
-	m_pMotion->Load("data\\TEXT\\legtank.txt");
+	m_pMotion->Load("data\\TEXT\\motion_walker.txt");
 	m_pMotion->SetType(0);
 	m_Move = MOVE_NONE;
 	pHitBox = CHitBox::Create(m_apModel[0]->GetMax(), m_apModel[0]->GetMin(), m_apModel[0]->GetPos() + GetPos());
 	m_posDest.x = GetPos().x;
 	m_posDest.z = GetPos().z;
 	m_posDest.y = GetPos().y;
+	m_rotDest = (D3DXVECTOR3(0.0f, D3DX_PI*0.5f, 0.0f));
 	return S_OK;
 }
 //=============================================
@@ -349,10 +350,28 @@ void CEnemy_Walker::Update()
 {
 
 	CPlayer * pPlayer = NULL;
-
+	pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
 
 
 	D3DXVECTOR3 move = GetMove();
+	if (pPlayer != NULL)
+	{
+		m_pMotion->SetType(MOVE_WALK);
+		if (pPlayer->GetPos().x - GetPos().x > 0.0f)
+		{
+			move.x += ENEMY_MOVE;
+		}
+		else
+		{
+			move.x -= ENEMY_MOVE;
+		}
+		
+	}
+	else
+	{
+		m_pMotion->SetType(MOVE_NONE);
+	}
+	m_rotDest = CBullet::VectorToAngles(-move);
 	move.x *= 0.92f;//原則係数
 	move.z *= 0.92f;//原則係数
 	move.y -= GRAVITY;

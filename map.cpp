@@ -1,8 +1,9 @@
 #include "map.h"
 #include "manager.h"
 #include "scene.h"
-
-
+#include "gate_UI.h"
+#include "Xmanager.h"
+#include "objectX.h"
 #include <stdio.h>
 #include <assert.h>
 //====================================-----
@@ -19,7 +20,15 @@ CMap::~CMap()
 
 HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 {
+	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
 
+	for (int i = 0; i < NUM_OBJECTX; i++)
+	{
+		if (*(pObjectX + i) != NULL)
+		{
+			pObjectX[i]->Release();
+		}
+	}
 	//ïœêîêÈåæ
 	int nMapID[c_nObjectX * c_nObjectY] = {};
 	int nCount = 0;;
@@ -66,7 +75,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				if (pPlayer != NULL)
 				{
 					pos.y += 100.0f;
-				
+					pos.x += 240.0f;
 					pPlayer->SetPos(pos);
 				}
 				else
@@ -96,6 +105,13 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				CObjectX::Create("data\\MODEL\\corridor_block.x", pos);
 				break;
 			case 7://èoå˚
+				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
+				CObjectX::Create("data\\MODEL\\gate.x", pos);
+				pos.y += 150.0f;
+				pos.x += 240.0f;
+				
+				CGate_UI::Create(pos);
 				break;
 			default:
 				assert(false);

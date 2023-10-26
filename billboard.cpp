@@ -18,8 +18,10 @@
 CBillboard::CBillboard(int nPriority) : CObject(nPriority)
 {
 	m_Cclor = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
+	Tex_min = D3DXVECTOR2(0.0f, 0.0f);
+	Tex_max = D3DXVECTOR2(1.0f, 1.0f);
 	m_pVtxBuff = NULL;
+	m_pName = NULL;
 	m_fHeight = 0.0f;
 	m_fWidth = 0.0f;
 }
@@ -44,7 +46,12 @@ HRESULT CBillboard::Init(void)
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = pRenderer->GetDevice();
 
-
+	if (m_pName != NULL)
+	{
+		CTexture * pTex = CManager::GetInstance()->GetTexture();
+		m_nIdxTex[0] = pTex->Regist(m_pName);
+	}
+	
 
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4,
 		D3DUSAGE_WRITEONLY,
@@ -145,10 +152,10 @@ void CBillboard::Update(void)
 	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
 	//テクスチャ座標
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[0].tex = D3DXVECTOR2(Tex_min.x, Tex_min.y);
+	pVtx[1].tex = D3DXVECTOR2(Tex_max.x, Tex_min.y);
+	pVtx[2].tex = D3DXVECTOR2(Tex_min.x, Tex_max.y);
+	pVtx[3].tex = D3DXVECTOR2(Tex_max.x, Tex_max.y);
 
 	//頂点カラーの設定
 	pVtx[0].col = m_Cclor;
