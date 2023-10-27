@@ -91,6 +91,7 @@ CTitle::~CTitle()
 //=============================================
 HRESULT CTitle::Init()
 {
+
 	m_pLight = DBG_NEW CLight;
 	m_pLight->Init();
 	m_pCamera = DBG_NEW CCamera;
@@ -178,6 +179,7 @@ void CTitle::Update()
 	}
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
+	
 	if (pInputKeyboard->GetTrigger(DIK_RETURN)|| pInputGamepad->GetTrigger(CInputGamePad::Button_START,0))
 	{
 		m_pFade->FadeOut(MODE::MODE_GAME);
@@ -268,7 +270,7 @@ HRESULT CGame::Init()
 	m_pLight = DBG_NEW CLight;
 	m_pPlayer = CPlayer::Create();
 	m_pTimer = m_pTimer->Create();
-
+	CManager::GetInstance()->SetStageCount(1);
 	CEnemy_Walker::Create(D3DXVECTOR3(6000.0f, -2500.0f, 0.0f), 10);
 	CMap::Load("data\\TEXT\\map\\map_01_Rooms.csv", m_pPlayer);
 	//‰Šú‰»Ý’è;
@@ -352,8 +354,8 @@ void CGame::Update()
 			CManager::GetInstance()->SetPause(true);
 		}
 	}
-
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) || pInputGamepad->GetTrigger(CInputGamePad::Button_START, 0))
+	float fTime = m_pTimer->GetTimer();
+	if (pInputKeyboard->GetTrigger(DIK_RETURN) || pInputGamepad->GetTrigger(CInputGamePad::Button_START, 0) || fTime == 0.0f)
 	{
 		m_pFade->FadeOut(MODE::MODE_RESULT);
 	}

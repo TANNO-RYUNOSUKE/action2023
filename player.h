@@ -12,7 +12,7 @@
 #include "object2D.h"
 #include "objectlight.h"
 #include "ui_system_message.h"
-#include "orbit.h"
+
 
 //マクロ定義
 #define GRAVITY (0.4f)
@@ -41,7 +41,7 @@ public:
 		LOWERMOTION_NONE = -1,
 		LOWERMOTION_NEUTRAL,
 		LOWERMOTION_WALK,
-		LOWERMOTION_STOP,
+		LOWERMOTION_FLIP,
 		LOWERMOTION_JUMP,
 		LOWERMOTION_ATTACK1,
 		LOWERMOTION_ATTACK2,
@@ -92,7 +92,7 @@ private:
 	int m_nNumModel;//使用するモデルの数
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 	CObjectLight * m_pLight;
-	COrbit * m_pOrbit;
+
 	
 };
 

@@ -127,7 +127,7 @@ void CEnemy::Uninit()
 //=============================================
 void CEnemy::Update()
 {
-
+	
 	if (m_apModel[0] != NULL)
 	{
 		pHitBox->SetPos(GetPos() + m_apModel[0]->GetPos());
@@ -245,6 +245,7 @@ void CEnemy::Update()
 	//{
 	//	m_nLife = 0;
 	//}
+	
 }
 //=============================================
 //•`‰æŠÖ”
@@ -353,27 +354,35 @@ void CEnemy_Walker::Update()
 	pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
 
 
-	D3DXVECTOR3 move = GetMove();
-	if (pPlayer != NULL)
+	D3DXVECTOR3 move = GetMove(); if (m_State == STATE_NONE)
 	{
-		m_pMotion->SetType(MOVE_WALK);
-		if (pPlayer->GetPos().x - GetPos().x > 0.0f)
+		if (pPlayer != NULL)
 		{
-			move.x += ENEMY_MOVE;
+			m_pMotion->SetType(MOVE_WALK);
+			if (pPlayer->GetPos().x - GetPos().x > 0.0f)
+			{
+				move.x += ENEMY_MOVE;
+			}
+			else
+			{
+				move.x -= ENEMY_MOVE;
+			}
+
 		}
 		else
 		{
-			move.x -= ENEMY_MOVE;
+			m_pMotion->SetType(MOVE_NONE);
 		}
-		
+		m_rotDest = CBullet::VectorToAngles(-move);
 	}
 	else
 	{
-		m_pMotion->SetType(MOVE_NONE);
+		m_pMotion->SetType(MOVE_DAMAGE);
+		m_rotDest = CBullet::VectorToAngles(move);
+		SetRot(m_rotDest);
 	}
-	m_rotDest = CBullet::VectorToAngles(-move);
-	move.x *= 0.92f;//Œ´‘¥ŒW”
-	move.z *= 0.92f;//Œ´‘¥ŒW”
+	move.x *= 0.95f;//Œ´‘¥ŒW”
+	move.z *= 0.95f;//Œ´‘¥ŒW”
 	move.y -= GRAVITY;
 
 

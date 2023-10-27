@@ -3,11 +3,13 @@
 #include "scene.h"
 #include "gate_UI.h"
 #include "Xmanager.h"
+#include"enemy.h"
 #include "objectX.h"
 #include <stdio.h>
 #include <assert.h>
 //====================================-----
 //マップローダー
+
 
 CMap::CMap()
 {
@@ -58,6 +60,10 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 	//ファイルを閉じる
 	fclose(pFile);
 
+	int nCnt = 0;
+	int nMax = CManager::GetInstance()->GetStageCount();
+	nMax *= 0.5f;
+	nMax++;
 	for (int i = 0; i < c_nObjectX ; i++)
 	{
 		for (int j = 0; j < c_nObjectY; j++)
@@ -87,19 +93,66 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
+				if (rand()%10 == 0)
+				{
+					if (nCnt < nMax)
+					{
+						pos.y += 100.0f;
+						pos.x += 240.0f;
+						CEnemy_Walker::Create(pos, 30);
+						nCnt++;
+					}
+				}
 				break;
 			case 3://上空き
-			
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
+				if (rand() % 10 == 0)
+				{
+					if (nCnt < nMax)
+					{
+						if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+						{
+							pos.y += 100.0f;
+							pos.x += 240.0f;
+							CEnemy_Walker::Create(pos, 10);
+							nCnt++;
+						}
+					}
+				}
 				break;
 			case 4://下空き
 				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
-			
+				if (rand() % 10 == 0)
+				{
+					if (nCnt < nMax)
+					{
+						if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+						{
+							pos.y += 100.0f;
+							pos.x += 240.0f;
+							CEnemy_Walker::Create(pos, 10);
+							nCnt++;
+						}
+					}
+				}
 				break;
 			case 5://吹き抜け
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+				if (rand() % 10 == 0)
+				{
+					if (nCnt < nMax)
+					{
+						if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+						{
+							pos.y += 100.0f;
+							pos.x += 240.0f;
+							CEnemy_Walker::Create(pos, 10);
+							nCnt++;
+						}
+					}
+				}
 				break;
 			case 6://立ち入り禁止
 				CObjectX::Create("data\\MODEL\\corridor_block.x", pos);

@@ -71,6 +71,8 @@ public:
 
 	 int GetLightCount(void) { return m_nLight; }
 	 void SetLightCount(int nCount) { m_nLight = nCount; }
+	 int GetStageCount(void) { return m_nStageCount; }
+	 void SetStageCount(int nCount) { m_nStageCount = nCount; }
 
 	 static CManager * GetInstance() {
 		 if (pInstance == NULL) { pInstance = DBG_NEW CManager; return pInstance; }
@@ -97,6 +99,7 @@ private:
 	int m_nHitStop;
 	int m_nScoreSave;
 	int m_nLight;
+	int m_nStageCount;
 };
 
 

@@ -30,7 +30,7 @@
 
 //ƒ}ƒNƒ’è‹`
 #define MOVE_PLAYER (2.0f)
-#define DASH_PLAYER (27.5f)
+#define DASH_PLAYER (35.0f)
 #define JUMP_PLAYER (20.0f)
 //=============================================
 //ƒRƒ“ƒXƒgƒ‰ƒNƒ^
@@ -72,13 +72,12 @@ HRESULT CPlayer::Init()
 	m_nLife = 10;
 
 	
-	m_pOrbit = COrbit::Create(1.0f, 32, D3DXCOLOR(1.0f, 0.6f, 0.0f, 1.0f), GetPos());
 
 	m_pMotionUp = DBG_NEW CMotion;
 	m_pMotionUp->SetModel(&m_apModel[0]);
 
 	m_pMotionUp->Load("data\\TEXT\\motion_player.txt");
-	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(0.4f, 0.4f, 0.5f, 1.0f), GetPos(), 500);
+	m_pLight = CObjectLight::Create(D3DLIGHT_POINT, D3DXCOLOR(1.5f, 1.5f, 1.7f, 1.0f), GetPos(), 500);
 	m_pLight->GetLight()->Falloff = 100.0f;
 	m_pLight->GetLight()->Attenuation0 = 2.0f;
 	m_pLight->GetLight()->Attenuation1 = 0.0f;
@@ -115,8 +114,6 @@ void CPlayer::Uninit()
 //=============================================
 void CPlayer::Update()
 {
-	m_pOrbit->SetOffset(D3DXVECTOR3(m_apModel[0]->GetMatrix()._41, m_apModel[0]->GetMatrix()._42, m_apModel[0]->GetMatrix()._43), D3DXVECTOR3(m_apModel[2]->GetMatrix()._41, m_apModel[2]->GetMatrix()._42, m_apModel[2]->GetMatrix()._43));
-	m_pOrbit->Draw();
 	CSound * pSound = CManager::GetInstance()->GetSound();
 	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
@@ -144,7 +141,7 @@ void CPlayer::Update()
 			//seepos.y += 200.0f;
 			m_pLight->SetPos(seepos);
 			pCamera->SetRDest(seepos);
-			seepos.z -= 750.0f;
+			seepos.z -= 1000.0f;
 			seepos.y += 50.0f;
 			pCamera->SetVDest(seepos);
 		}
@@ -160,6 +157,18 @@ void CPlayer::Update()
 
 		SetPosOld(GetPos());//posold‚ÌXV
 		Move();
+		if (m_pTarget != NULL)
+		{
+			if (*m_pTarget)
+			{
+				if (m_pMotionUp->GetType() != LOWERMOTION_WALK)
+				{
+					D3DXVECTOR3 rot = GetRot();
+					rot.y = CBullet::VectorToAngles(GetPos() - (*m_pTarget)->GetPos()).y;
+					SetRot(rot);
+				}
+			}
+		}
 
 		if (pInputKeyboard->GetTrigger(DIK_LSHIFT))
 		{
@@ -214,7 +223,7 @@ void CPlayer::Update()
 			case CPlayer::STATE_NEUTRAL:
 				break;
 			case CPlayer::STATE_DASH:
-				SetState(STATE_HOVER, 60);
+				m_state = STATE_NEUTRAL;
 				break;
 			case CPlayer::STATE_HOVER:
 				m_state = STATE_NEUTRAL;
@@ -226,6 +235,7 @@ void CPlayer::Update()
 				break;
 			}
 		}
+		
 		CEnemy ** pEnemy = CManager::GetInstance()->GetEnemyManager()->GetEnemy();
 		D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[0]->GetMatrix()._41, m_apModel[0]->GetMatrix()._42, m_apModel[0]->GetMatrix()._43);
 		switch (m_state)
@@ -252,11 +262,21 @@ void CPlayer::Update()
 						{
 							if (pos.x >= min.x - 100.0f && pos.y >= min.y - 100.0f && pos.z >= min.z - 100.0f)
 							{
+								m_pMotionUp->SetType(CPlayer::LOWERMOTION_FLIP);
 								(*pEnemy)->AddLife(-1);
-								SetState(STATE_HOVER, 60);
+								(*pEnemy)->SetState(CEnemy::STATE_DAMAGE, 60);
+								D3DXVECTOR3 vec  = (*pEnemy)->GetPos() -GetPos();
+								
+								D3DXVec3Normalize(&vec, &vec);
+								(*pEnemy)->SetMove((*pEnemy)->GetMove() + vec * 10.0f);
+								m_state = STATE_NEUTRAL;
 								m_pTarget = pEnemy;
 								D3DXVECTOR3 move = GetMove();
-								move.y = 20.0f;
+								vec.y = 0.0f;
+								vec.x *= -1.0f;
+								D3DXVec3Normalize(&vec, &vec);
+								vec.y = 0.75f;
+								move = vec * 15.0f;
 								SetMove(move);
 								CParticle::Create(D3DXVECTOR3(m_apModel[1]->GetMatrix()._41, m_apModel[1]->GetMatrix()._42, m_apModel[1]->GetMatrix()._43), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 80.0f, 3, 5, 1.01f);
 								CParticle::Create(D3DXVECTOR3(m_apModel[1]->GetMatrix()._41, m_apModel[1]->GetMatrix()._42, m_apModel[1]->GetMatrix()._43), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 480.0f, 30, 1);
@@ -365,75 +385,88 @@ void CPlayer::Move()
 	D3DXVECTOR3 rot = GetRot();
 	D3DXVECTOR3 move = GetMove();
 	float fSpeed = MOVE_PLAYER;
-	bool bMove = false;
-	float fHeight = GetHeight();
-	float fWidth = GetWidth();
-	
-
-
-	//ˆÚ“®
-	if (m_state == STATE_NEUTRAL)
-	{
-		if (pInputKeyboard->GetPress(DIK_A))
-		{
-			move.x -= fSpeed;
-			bMove = true;
-		}
-		if (pInputKeyboard->GetPress(DIK_D))
-		{
-			move.x += fSpeed;
-			bMove = true;
-		}
-		if ((pInputKeyboard->GetTrigger(DIK_W)) && m_bLand == true)
-		{
-			move.y = JUMP_PLAYER;
-			m_bLand = false;
-		}
-	}
-	if (pInputKeyboard->GetTrigger(DIK_SPACE))
-	{
-		D3DXVECTOR3 vec{ 0.0f,0.0f, 0.0f };
-		if (pInputKeyboard->GetPress(DIK_W))
-		{
-			vec.y += 0.75f;
-		}
-		if (pInputKeyboard->GetPress(DIK_A))
-		{
-			vec.x -= 1.0f;
-		}
-		if (pInputKeyboard->GetPress(DIK_S))
-		{
-			vec.y -= 0.75f;
-		}
-		if (pInputKeyboard->GetPress(DIK_D))
-		{
-			vec.x += 1.0f;
-		}
-		if (vec.x != 0.0f)
-		{
-			D3DXVec3Normalize(&vec, &vec);
-			move = vec * DASH_PLAYER;
-			SetState(STATE_DASH, 20);
-		}
-	}
+	float fDif = 1.0f;;
 
 	if (!m_bLand)
 	{
-		m_pMotionUp->SetType(CPlayer::LOWERMOTION_JUMP);
+		fSpeed *= 0.25f;
+		fDif *= 0.25f;
 	}
-	else
-	{
-		//•àsƒ‚[ƒVƒ‡ƒ“İ’è
-		if (bMove)
+	bool bMove = false;
+	float fHeight = GetHeight();
+	float fWidth = GetWidth();
+
+
+	//ˆÚ“®
+
+
+
+		if (m_state == STATE_NEUTRAL)
 		{
-			m_pMotionUp->SetType(CPlayer::LOWERMOTION_WALK);
+			if (pInputKeyboard->GetPress(DIK_A))
+			{
+				move.x -= fSpeed;
+				bMove = true;
+			}
+			if (pInputKeyboard->GetPress(DIK_D))
+			{
+				move.x += fSpeed;
+				bMove = true;
+			}
+			if ((pInputKeyboard->GetTrigger(DIK_W)) && m_bLand == true)
+			{
+				move.y = JUMP_PLAYER;
+				m_bLand = false;
+			}
+		}
+		if (pInputKeyboard->GetTrigger(DIK_SPACE))
+		{
+			D3DXVECTOR3 vec{ 0.0f,0.0f, 0.0f };
+			if (pInputKeyboard->GetPress(DIK_W))
+			{
+				vec.y += 0.75f;
+			}
+			if (pInputKeyboard->GetPress(DIK_A))
+			{
+				vec.y += 0.25f;
+				vec.x -= 1.0f;
+			}
+			if (pInputKeyboard->GetPress(DIK_S))
+			{
+				vec.y -= 0.75f;
+			}
+			if (pInputKeyboard->GetPress(DIK_D))
+			{
+				vec.y += 0.25f;
+				vec.x += 1.0f;
+			}
+			if (vec.x != 0.0f)
+			{
+				D3DXVec3Normalize(&vec, &vec);
+				move = vec * DASH_PLAYER;
+				SetState(STATE_DASH, 30);
+			}
+		}
+	
+	if (m_pMotionUp->GetType() != LOWERMOTION_FLIP)
+	{
+		if (!m_bLand)
+		{
+			m_pMotionUp->SetType(CPlayer::LOWERMOTION_JUMP);
 		}
 		else
 		{
-			m_pMotionUp->SetType(CPlayer::LOWERMOTION_NEUTRAL);
+			//•àsƒ‚[ƒVƒ‡ƒ“İ’è
+			if (bMove)
+			{
+				m_pMotionUp->SetType(CPlayer::LOWERMOTION_WALK);
+			}
+			else
+			{
+				m_pMotionUp->SetType(CPlayer::LOWERMOTION_NEUTRAL);
+			}
 		}
 	}
-	
 	//ƒWƒƒƒ“ƒv
 	if (move.x != 0 )
 	{
@@ -446,11 +479,19 @@ void CPlayer::Move()
 		break;
 	case CPlayer::STATE_NEUTRAL:
 		move.y -= GRAVITY;//d—Í‚ğ—^‚¦‚é
-		move.x *= 0.9f;//Œ´‘¥ŒW”
-		move.z *= 0.9f;//Œ´‘¥ŒW”
+		if (m_bLand)
+		{
+			move.x *= 0.9f;//Œ´‘¥ŒW”
+			move.z *= 0.9f;//Œ´‘¥ŒW”
+		}
+		{
+			move.x *= 0.98f;//Œ´‘¥ŒW”
+			move.z *= 0.98f;//Œ´‘¥ŒW”
+		}
 		break;
 	case CPlayer::STATE_DASH:
 		CParticle::Create(D3DXVECTOR3(m_apModel[1]->GetMatrix()._41, m_apModel[1]->GetMatrix()._42, m_apModel[1]->GetMatrix()._43), D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f), 1, 12, 10.0f, 20, 6, 1.01f);
+		move.y -= GRAVITY ;//d—Í‚ğ—^‚¦‚é
 		move.x *= 0.99f;//Œ´‘¥ŒW”
 		move.z *= 0.99f;//Œ´‘¥ŒW”
 		break;
@@ -474,7 +515,15 @@ void CPlayer::Move()
 	}
 
 	SetPos(pos + move);
-	SetRot(rot);
+	if (m_pMotionUp->GetType() != LOWERMOTION_FLIP)
+	{
+		SetRot(rot);
+	}
+	else
+	{
+		SetRot(-rot);
+	}
+
 	SetMove(move);
 	
 	CXManager * pManger = CManager::GetInstance()->GetXManager();

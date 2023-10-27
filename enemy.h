@@ -27,8 +27,11 @@ public:
 	void SetShot(int nShot) { m_nShot = nShot; }
 	void SetNext(CHitBox * pHitBox) { m_pNext = pHitBox; }
 	int GetShot() { return m_nShot; }
+	bool GetHit() { return m_bHit; }
+	void SetHt(bool bHit) { m_bHit = bHit; }
 private:
 	int m_nShot;
+	bool m_bHit;
 	D3DXVECTOR3 m_max;
 	D3DXVECTOR3 m_min;
 	D3DXVECTOR3 m_pos;
@@ -110,7 +113,7 @@ public:
 	{
 		MOVE_NONE = 0,
 		MOVE_WALK,
-		MOVE_ATTACK,
+		MOVE_DAMAGE,
 		MOVE_MAX
 	};
 	HRESULT Init(void);

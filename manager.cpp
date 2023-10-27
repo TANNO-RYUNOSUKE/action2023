@@ -59,6 +59,7 @@ HRESULT CManager::Init(HINSTANCE hinstance, HWND hWnd, BOOL bWindow)
 	m_pEnemyManager->Init();
 	m_pXManager = DBG_NEW CXManager;
 	m_pXManager->Init();
+	m_nStageCount = 1;
 	//‰Šú‰»Ý’è;
 	if (FAILED(m_pRenderer->Init(hWnd, TRUE)))
 	{

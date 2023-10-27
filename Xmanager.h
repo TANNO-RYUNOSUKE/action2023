@@ -8,7 +8,7 @@
 #include "main.h"
 #include "objectX.h"
 
-#define NUM_OBJECTX (128)//エネミーの最大数
+#define NUM_OBJECTX (400)//エネミーの最大数
 //クラス定義
 class CXManager //マネージャクラス
 {

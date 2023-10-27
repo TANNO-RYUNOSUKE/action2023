@@ -273,6 +273,7 @@ bool CBullet::CollisionEnemy(D3DXVECTOR3 pos)
 						return true;
 					}
 				}
+
 				pHitBox = pHitBox->GetNext();
 			} while (pHitBox != NULL);
 

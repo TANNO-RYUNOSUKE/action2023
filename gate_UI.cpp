@@ -12,6 +12,18 @@
 #include "player.h"
 #include "map.h"
 
+ char *c_apMapPath[] =					//マップデータ読み込み
+{
+	"data\\TEXT\\map\\map_01_Rooms.csv",
+	"data\\TEXT\\map\\map_02_Twin.csv",
+	"data\\TEXT\\map\\map_03_Step.csv",
+	"data\\TEXT\\map\\map_04_Rooms2.csv",
+};
+
+#define MAP_CORRIDOR ("data\\TEXT\\map\\map_00_Corridor.csv")
+
+
+
 CGate_UI::CGate_UI() :CBillboard(6)
 {
 }
@@ -78,7 +90,17 @@ void CGate_UI::Update()
 			if (pInputKeyboard->GetTrigger(DIK_W))
 			{
 				Release();
-				CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", pPlayer);
+				CManager::GetInstance()->SetStageCount(CManager::GetInstance()->GetStageCount() + 1);
+				if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+				{
+					int nRand = rand() % 4;
+					CMap::Load(c_apMapPath[nRand], pPlayer);
+				}
+				else
+				{
+					CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", pPlayer);
+				}
+			
 			}
 		}
 	}
