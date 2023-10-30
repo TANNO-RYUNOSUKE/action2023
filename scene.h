@@ -8,7 +8,7 @@
 #include "main.h"
 #include "object.h"
 #include "object2D.h"
-
+#include "number.h"
 #include "ui_system_message.h"
 #include "timer.h"
 //前方宣言
@@ -34,7 +34,7 @@ class CWave_UI;//ウェーブUI
 class CEnemy_UI;//エネミーUI
 class CMap_Editer;
 class CRankng;
-
+class CPause;
 
 
 //クラス定義
@@ -64,7 +64,7 @@ public:
 	static CFade * m_pFade;
 	virtual CPlayer * GetPlayer(void) { return NULL; }
 	virtual CCamera * GetCamera(void) { return NULL; }
-
+	virtual void SetPlayer(CPlayer * pPlayer) { ; }
 private:
 	MODE m_Mode;
 
@@ -118,6 +118,7 @@ public:
 	void Draw(void);
 private:
 	CRankng *m_pRanking;
+	CNumber * m_apNumber[2]; //ナンバーオブジェクトへのポインタ
 
 };
 
@@ -142,13 +143,12 @@ public:
 
 	 void SetPlayer(CPlayer * pPlayer) { m_pPlayer = pPlayer; }
 private:
-	
+	CPause * m_pPause;
 	 CPlayer * m_pPlayer;//プレイヤーのポインタ
 	 CUI_System_Message * m_pUI;
 	 CCamera * m_pCamera;//カメラのポインタ
 	 CLight * m_pLight;//ライトのポインタ
 	 CTimer * m_pTimer;
-
 	int m_nCnt;
 	bool b_Pause;//ポーズ
 };

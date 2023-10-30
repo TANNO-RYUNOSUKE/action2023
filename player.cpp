@@ -27,6 +27,7 @@
 #include "enemymanager.h"
 #include "enemy.h"
 #include "ui_system_message.h"
+#include"fake_bluescreen.h"
 
 //マクロ定義
 #define MOVE_PLAYER (2.0f)
@@ -64,15 +65,19 @@ CPlayer::~CPlayer()
 //=============================================
 HRESULT CPlayer::Init()
 {
-
+	m_nCntInvincivl = 0;
 	m_pTarget = NULL;
-	m_pFilterDamage = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, SCREEN_WIDTH, 0, "data\\TEXTURE\\RedFilter.png");
+	m_pFilterDamage = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, SCREEN_WIDTH, 6, "data\\TEXTURE\\RedFilter.png");
 	m_pFilterDamage->SetDisp(false);
-	
+	m_nFilter = 0;
 	m_nLife = 10;
 
-	
-
+	m_apTargetUI[0] = CBillboard::Create(60.0f, 60.0f,GetPos(), "data\\TEXTURE\\UI\\target2.png");
+	m_apTargetUI[1] = CBillboard::Create(60.0f, 60.0f, GetPos(), "data\\TEXTURE\\UI\\target1.png");
+	for (int i = 0; i < 2; i++)					
+	{
+		m_apTargetUI[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+	}
 	m_pMotionUp = DBG_NEW CMotion;
 	m_pMotionUp->SetModel(&m_apModel[0]);
 
@@ -114,6 +119,22 @@ void CPlayer::Uninit()
 //=============================================
 void CPlayer::Update()
 {
+	m_nFilter--;
+	m_nCntInvincivl--;
+	m_nReload--;
+	if (m_nFilter <= 0)
+	{
+		m_nFilter = 0;
+		m_pFilterDamage->SetDisp(false);
+	}
+	else
+	{
+		m_pFilterDamage->SetDisp(true);
+	}
+	if (m_nCntInvincivl <0)
+	{
+		m_nCntInvincivl = 0;
+	}
 	CSound * pSound = CManager::GetInstance()->GetSound();
 	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
@@ -156,11 +177,21 @@ void CPlayer::Update()
 
 
 		SetPosOld(GetPos());//posoldの更新
-		Move();
+		if (m_state != STATE_DEATH)
+		{
+			Move();
+		}
+	
 		if (m_pTarget != NULL)
 		{
 			if (*m_pTarget)
 			{
+				for (int i = 0; i < 2; i++)
+				{
+					m_apTargetUI[i]->SetColor(D3DXCOLOR(1.0f, 1.0f,1.0f, 1.0f));
+				}
+				m_apTargetUI[0]->SetPos(D3DXVECTOR3((*m_pTarget)->GetModel()->GetMatrix()._41, (*m_pTarget)->GetModel()->GetMatrix()._42, (*m_pTarget)->GetModel()->GetMatrix()._43));
+				m_apTargetUI[1]->SetPos(m_apTargetUI[1]->GetPos() +(D3DXVECTOR3((*m_pTarget)->GetModel()->GetMatrix()._41, (*m_pTarget)->GetModel()->GetMatrix()._42, (*m_pTarget)->GetModel()->GetMatrix()._43) - m_apTargetUI[1]->GetPos()) *0.2f);
 				if (m_pMotionUp->GetType() != LOWERMOTION_WALK)
 				{
 					D3DXVECTOR3 rot = GetRot();
@@ -168,10 +199,27 @@ void CPlayer::Update()
 					SetRot(rot);
 				}
 			}
+			else
+			{
+				for (int i = 0; i < 2; i++)
+				{
+					m_pTarget = nullptr;
+					m_apTargetUI[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+					m_apTargetUI[i]->SetPos(pCamera->GetPosV());
+				}
+			}
 		}
-
-		if (pInputKeyboard->GetTrigger(DIK_LSHIFT))
+		else
 		{
+			for (int i = 0; i < 2; i++)
+			{
+				m_apTargetUI[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+				m_apTargetUI[i]->SetPos(pCamera->GetPosV());
+			}
+		}
+		if ((pInputKeyboard->GetPress(DIK_LSHIFT) || pInputGamePad->GetTrigger(CInputGamePad::Button_RB,0))&& m_nReload <= 0)
+		{
+			m_nReload = 6;
 			D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43);
 			if (m_pTarget != NULL)
 			{
@@ -179,7 +227,13 @@ void CPlayer::Update()
 				{
 					D3DXVECTOR3 vec = pos - ((*m_pTarget)->GetPos() + (*m_pTarget)->GetModel()->GetPos());
 					D3DXVec3Normalize(&vec, &vec);
-					CBullet::Create(pos, -vec * 50.0f, 30, CBullet::TYPE_PLAYER, false);
+					
+					for (int i = 0; i < 8; i++)
+					{
+						m_nReload = 50;
+						CBullet::Create(pos, -vec * 50.0f, 300, CBullet::TYPE_PLAYER, false, m_pTarget);
+					}
+					
 				}
 				else
 				{
@@ -193,25 +247,7 @@ void CPlayer::Update()
 
 		}
 
-		if (m_nLife <= 0)
-		{
-			for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
-			{
-				/*	if (m_apModelUp[nCnt] != NULL)
-					{
-						D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelUp[nCnt]->GetMatrix()._41, m_apModelUp[nCnt]->GetMatrix()._42, m_apModelUp[nCnt]->GetMatrix()._43);
-						CDebri::Create(m_apModelUp[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
-					}
-					if (m_apModelLow[nCnt] != NULL)
-					{
-						D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelLow[nCnt]->GetMatrix()._41, m_apModelLow[nCnt]->GetMatrix()._42, m_apModelLow[nCnt]->GetMatrix()._43);
-						CDebri::Create(m_apModelLow[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
-					}*/
-			}
-			// CGame::SetPlayer(NULL);
-
-			Release();
-		}
+	
 		m_nStateCount--;
 		if (m_nStateCount <= 0)
 		{
@@ -227,6 +263,16 @@ void CPlayer::Update()
 				break;
 			case CPlayer::STATE_HOVER:
 				m_state = STATE_NEUTRAL;
+				break;
+			case CPlayer::STATE_DAMAGE:
+				m_state = STATE_NEUTRAL;
+				break;
+			case CPlayer::STATE_DEATH:
+				CManager::GetInstance()->GetScene()->SetPlayer(NULL);
+				CFake_BlueScreen::Create();
+				Release();
+
+				return;
 				break;
 			case CPlayer::STATE_MAX:
 				break;
@@ -262,6 +308,9 @@ void CPlayer::Update()
 						{
 							if (pos.x >= min.x - 100.0f && pos.y >= min.y - 100.0f && pos.z >= min.z - 100.0f)
 							{
+								CSound * pSound = CManager::GetInstance()->GetSound();
+								pSound->Play(CSound::SOUND_LABEL_SE_SLASHHIT);
+								m_nCntInvincivl = 60;
 								m_pMotionUp->SetType(CPlayer::LOWERMOTION_FLIP);
 								(*pEnemy)->AddLife(-1);
 								(*pEnemy)->SetState(CEnemy::STATE_DAMAGE, 60);
@@ -292,12 +341,36 @@ void CPlayer::Update()
 			break;
 		case CPlayer::STATE_HOVER:
 			break;
+		case CPlayer::STATE_DAMAGE:
+			break;
+		case CPlayer::STATE_DEATH:
+			break;
 		case CPlayer::STATE_MAX:
 			break;
 		default:
 			assert(false);
 			break;
 		}
+	}
+	if (m_nLife <= 0 && m_state != STATE_DEATH)
+	{
+		SetState(STATE_DEATH, 300);
+		for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
+		{
+			/*	if (m_apModelUp[nCnt] != NULL)
+			{
+			D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelUp[nCnt]->GetMatrix()._41, m_apModelUp[nCnt]->GetMatrix()._42, m_apModelUp[nCnt]->GetMatrix()._43);
+			CDebri::Create(m_apModelUp[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
+			}
+			if (m_apModelLow[nCnt] != NULL)
+			{
+			D3DXVECTOR3 pos = D3DXVECTOR3(m_apModelLow[nCnt]->GetMatrix()._41, m_apModelLow[nCnt]->GetMatrix()._42, m_apModelLow[nCnt]->GetMatrix()._43);
+			CDebri::Create(m_apModelLow[nCnt]->GetName(), pos, GetRot(), D3DXVECTOR3(rand() % 20 - 10, rand() % 20 - 10, rand() % 20 - 10), D3DXVECTOR3((rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f, (rand() % 20 - 10) * 0.01f), 120);
+			}*/
+		}
+		// CGame::SetPlayer(NULL);
+		
+		m_pMotionUp->SetType(LOWERMOTION_DEATH);
 	}
 }
 //=============================================
@@ -413,13 +486,18 @@ void CPlayer::Move()
 				move.x += fSpeed;
 				bMove = true;
 			}
-			if ((pInputKeyboard->GetTrigger(DIK_W)) && m_bLand == true)
+			if (pInputGamePad->GetStickL(0, 0.1f) != D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+			{
+				move.x += pInputGamePad->GetStickL(0, 0.1f).x * fSpeed;
+				bMove = true;
+			}
+			if (((pInputKeyboard->GetTrigger(DIK_W))  || pInputGamePad->GetTrigger(CInputGamePad::Button_A,0))&& m_bLand == true)
 			{
 				move.y = JUMP_PLAYER;
 				m_bLand = false;
 			}
 		}
-		if (pInputKeyboard->GetTrigger(DIK_SPACE))
+		if (pInputKeyboard->GetTrigger(DIK_SPACE) || pInputGamePad->GetTrigger(CInputGamePad::Button_X,0) )
 		{
 			D3DXVECTOR3 vec{ 0.0f,0.0f, 0.0f };
 			if (pInputKeyboard->GetPress(DIK_W))
@@ -440,15 +518,24 @@ void CPlayer::Move()
 				vec.y += 0.25f;
 				vec.x += 1.0f;
 			}
+			if (pInputGamePad->GetStickL(0,0.1f)!= D3DXVECTOR3(0.0f, 0.0f, 0.0f))
+			{
+				vec = pInputGamePad->GetStickL(0, 0.1f);
+				vec.y *= -1.0f;
+				vec.y += 0.25f;
+			}
+
 			if (vec.x != 0.0f)
 			{
+				CSound * pSound = CManager::GetInstance()->GetSound();
+				pSound->Play(CSound::SOUND_LABEL_SE_HIGHSPEED);
 				D3DXVec3Normalize(&vec, &vec);
 				move = vec * DASH_PLAYER;
 				SetState(STATE_DASH, 30);
 			}
 		}
 	
-	if (m_pMotionUp->GetType() != LOWERMOTION_FLIP)
+	if (m_pMotionUp->GetType() != LOWERMOTION_FLIP && m_pMotionUp->GetType() != LOWERMOTION_DAMAGE)
 	{
 		if (!m_bLand)
 		{
@@ -502,7 +589,8 @@ void CPlayer::Move()
 	case CPlayer::STATE_MAX:
 		break;
 	default:
-
+			move.x *= 0.9f;//原則係数
+			move.z *= 0.9f;//原則係数
 		break;
 	}
 	if (m_state == STATE_DASH)
@@ -554,7 +642,8 @@ void CPlayer::Move()
 	{
 		D3DXVECTOR3 move = D3DXVECTOR3(GetMove().x * -1.0f, GetMove().y, GetMove().z);
 		D3DXVec3Normalize(&move, &move);
-		SetMove(move * DASH_PLAYER);
+		SetMove(move * DASH_PLAYER *0.7f);
+		m_state = STATE_NEUTRAL;
 	
 	}
 
@@ -562,8 +651,9 @@ void CPlayer::Move()
 	{
 		D3DXVECTOR3 move = D3DXVECTOR3(GetMove().x, GetMove().y * -1.0f, GetMove().z);
 		D3DXVec3Normalize(&move, &move);
-		SetMove(move * DASH_PLAYER);
-		
+		SetMove(move * DASH_PLAYER*0.7f);
+		m_state = STATE_NEUTRAL;
+	
 	}
 
     CItemManager * pItemmanager = CManager::GetInstance()->GetItemManager();

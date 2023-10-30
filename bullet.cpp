@@ -53,10 +53,7 @@ CBullet::~CBullet()
 HRESULT CBullet::Init()
 {
 
-	D3DXVECTOR3 pos1, pos2;
-	pos1 = GetPos(); pos2 = GetPos();
-	pos1.y += 10.0f;
-	pos2.y -= 10.0f;
+
 	
 	CBillboard::Init();
 	SetType(CObject::TYPE_BULLET);
@@ -65,7 +62,16 @@ HRESULT CBullet::Init()
 	CTexture * pTex = CManager::GetInstance()->GetTexture();
 	
 	m_nIdxTex[0] = pTex->Regist("data\\TEXTURE\\Bullet000.png");
-
+	m_pOrbit = COrbit::Create(20.0f, 128, D3DXCOLOR(1.5f, 1.5f, 1.5f
+		, 1.0f), GetPos());
+	D3DXVECTOR3 pos1, pos2;
+	pos1 = GetPos(); pos2 = GetPos();
+	pos1.y += 10.0f;
+	pos2.y -= 10.0f;
+	m_pOrbit->SetOffset(pos1, pos2);
+	m_pOrbit->SetDisp(false);
+	m_pOrbit->Update();
+	m_pOrbit->SetDisp(true);
 
 	return S_OK;
 }
@@ -94,9 +100,13 @@ void CBullet::Update()
 	case CBullet::TYPE_PLAYER:
 		m_posOld = GetPos();
 	
-		pos1.y += 10.0f;
-		pos2.y -= 10.0f;
-
+		pos1.y += 5.0f;
+		pos2.y -= 5.0f;
+		m_pOrbit->SetOffset(pos1, pos2);
+		if (m_pTarget != NULL)
+		{
+			LinerHoming();
+		}
 		
 		
 		CollisionEnemy(GetPos());
@@ -126,25 +136,37 @@ void CBullet::Update()
 	bool bRay = false;
 	CXManager * pManger = CManager::GetInstance()->GetXManager();
 	CObjectX ** pObjectX = CManager::GetInstance()->GetXManager()->GetX();
-	for (int i = 0; i < NUM_OBJECTX; i++)
+	if (m_pTarget == NULL)
 	{
-		if (*(pObjectX + i) != NULL)
+		for (int i = 0; i < NUM_OBJECTX; i++)
 		{
-			if (pObjectX[i]->Ray(GetPosOld(), GetPos()))
+			if (*(pObjectX + i) != NULL)
 			{
+				if (pObjectX[i]->Ray(GetPosOld(), GetPos()))
+				{
 
-				m_nLife = 0;
-				break;
+					m_nLife = 0;
+					break;
+				}
 			}
 		}
 	}
 	if (m_nLife <= 0)
 	{
-		
-	
-		CParticle::Create(CBullet::GetPos(), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 8.0f, 3, 5,1.01f);
-		CParticle::Create(CBullet::GetPos(), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 48.0f, 30, 1);
-		
+		CSound * pSound = CManager::GetInstance()->GetSound();
+		pSound->Play(CSound::SOUND_LABEL_SE_EXPLOSION);
+		if (m_pTarget == NULL)
+		{
+			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 8.0f, 3, 5, 1.01f);
+			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(1.0f, 0.6f, 0.3f, 1.0f), 1, 15, 48.0f, 30, 1);
+		}
+		else
+		{
+			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 60, 60.0f, 30, 10, 1.01f);
+			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 60, 360.0f, 300, 2);
+
+		}
+
 	
 		
 		CObject::Release();
@@ -301,8 +323,10 @@ bool CBullet::CollisionPlayer(D3DXVECTOR3 pos)
 				{
 				
 					m_nLife = 0;
-					pPlayer->AddLife(-1);
-					
+					if (pPlayer->GetInvincivl() <= 0)
+					{
+						pPlayer->AddLife(-1);
+					}
 				
 					return true;
 				}
@@ -311,7 +335,45 @@ bool CBullet::CollisionPlayer(D3DXVECTOR3 pos)
 	}
 	return false;
 }
+//=============================================
+//ホーミング関数
+//=============================================
+void CBullet::LinerHoming(void)
+{
+	if (*m_pTarget != NULL)
+	{
+		const int Hominginterval = 24;
+		const int nMoveMax = 2;
 
+		const int nDistur = 2000;//歪み
+		D3DXVECTOR3 vec = D3DXVECTOR3((*m_pTarget)->GetModel()->GetMatrix()._41, (*m_pTarget)->GetModel()->GetMatrix()._42, (*m_pTarget)->GetModel()->GetMatrix()._43) - GetPos();
+		float fDis = CManager::GetInstance()->GetDistance(vec);
+		if (m_nHomingCount % Hominginterval == 0)
+		{
+			if ( m_nMoveCount < nMoveMax)
+			{
+				m_nMoveCount++;
+				vec.x += float(rand() % nDistur - (nDistur / 2));
+				vec.y += float(rand() % nDistur - (nDistur / 2));
+				//vec.z += float(rand() % nDistur - (nDistur / 2));
+				D3DXVec3Normalize(&vec, &vec);
+				SetMove(vec * (10.0f + fDis * 0.01f));
+			}
+			else
+			{
+				SetMove(vec * (10.0f + fDis * 0.01f));
+			}
+
+		}
+		if ( m_nMoveCount >= nMoveMax)
+		{
+			D3DXVec3Normalize(&vec, &vec);
+			D3DXVECTOR3 move = GetMove();
+			SetMove(vec * (50.0f + fDis * 0.01f));
+		}
+		m_nHomingCount++;
+	}
+}
 // ベクトルを角度に変換する関数
 D3DXVECTOR3 CBullet::VectorToAngles(const D3DXVECTOR3& vector)
 {

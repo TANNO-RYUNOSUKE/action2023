@@ -145,6 +145,7 @@
     <ClInclude Include="enemy.h" />
     <ClInclude Include="enemymanager.h" />
     <ClInclude Include="fade.h" />
+    <ClInclude Include="fake_bluescreen.h" />
     <ClInclude Include="gate_UI.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="light.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="objectX.h" />
     <ClInclude Include="orbit.h" />
     <ClInclude Include="particle.h" />
+    <ClInclude Include="pause.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="objectlight.h" />
     <ClInclude Include="renderer.h" />
@@ -181,6 +183,7 @@
     <ClCompile Include="enemy.cpp" />
     <ClCompile Include="enemymanager.cpp" />
     <ClCompile Include="fade.cpp" />
+    <ClCompile Include="fake_bluescreen.cpp" />
     <ClCompile Include="gate_UI.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="light.cpp" />
@@ -197,6 +200,7 @@
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="orbit.cpp" />
     <ClCompile Include="particle.cpp" />
+    <ClCompile Include="pause.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="scene.cpp" />

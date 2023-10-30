@@ -148,7 +148,7 @@ void CEnemy::Update()
 		
 			D3DXVec3Normalize(&vec, &vec);
 			vec.y = 0.1f;
-			SetMove(vec * 200.0f);
+			SetMove(vec * 20.0f);
 			SetState(STATE_DEAD, 60);
 		}
 	}
@@ -210,7 +210,8 @@ void CEnemy::Update()
 			m_State = STATE_NONE;
 			break;
 		case CEnemy::STATE_DEAD:
-			
+			pSound->Play(CSound::SOUND_LABEL_SE_DESTRUCT);
+			pSound->Play(CSound::SOUND_LABEL_SE_EXPLOSION);
 				for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
 				{
 					if (m_apModel[nCnt] != NULL)
@@ -358,16 +359,24 @@ void CEnemy_Walker::Update()
 	{
 		if (pPlayer != NULL)
 		{
-			m_pMotion->SetType(MOVE_WALK);
-			if (pPlayer->GetPos().x - GetPos().x > 0.0f)
+			if (pPlayer->GetState()==CPlayer::STATE_DEATH)
 			{
-				move.x += ENEMY_MOVE;
+				m_pMotion->SetType(MOVE_NONE);
 			}
 			else
 			{
-				move.x -= ENEMY_MOVE;
-			}
+				m_pMotion->SetType(MOVE_WALK);
+				if (pPlayer->GetPos().x - GetPos().x > 0.0f)
+				{
+					move.x += ENEMY_MOVE;
+				}
+				else
+				{
+					move.x -= ENEMY_MOVE;
+				}
 
+			}
+		
 		}
 		else
 		{
@@ -387,6 +396,32 @@ void CEnemy_Walker::Update()
 
 
 	SetMove(move);
+	if (pPlayer != NULL)
+	{
+		D3DXVECTOR3 max = GetPos() + GetModel()->GetPos() + GetModel()->GetMax();
+		D3DXVECTOR3 min = GetPos() + GetModel()->GetPos() + GetModel()->GetMin();
+		D3DXVECTOR3 pos = pPlayer->GetPos() + pPlayer->GetModelUp()->GetPos();
+		if (pos.x <= max.x && pos.x >= min.x)
+		{
+			if (pos.y <= max.y && pos.y >= min.y)
+			{
+				if (pPlayer->GetInvincivl() <= 0 && pPlayer->GetState() != CPlayer::STATE_DAMAGE&& pPlayer->GetState() != CPlayer::STATE_DEATH &&  pPlayer->GetState() != CPlayer::STATE_DASH)
+				{
+					pPlayer->AddLife(-1);
+					pPlayer->GetMotion()->SetType(CPlayer::LOWERMOTION_DAMAGE);
+					pPlayer->SetState(CPlayer::STATE_DAMAGE, 15);
+					D3DXVECTOR3 vec = pos - (GetPos() + GetModel()->GetPos());
+					vec.y = 0.0f;
+					vec.z = 0.0f;
+					D3DXVec3Normalize(&vec, &vec);
+					pPlayer->SetMove(pPlayer->GetMove() + vec * 50.0f);
+					pPlayer->SetInvincivl(120);
+					pPlayer->SetFilterDisp(6);
+				}
+			}
+		}
+	}
+	
 
 	CEnemy::Update();
 }

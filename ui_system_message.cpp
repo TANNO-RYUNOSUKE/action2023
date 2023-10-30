@@ -74,14 +74,7 @@ void CUI_System_Message::Update(void)
 	}
 
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
-	if (pInputKeyboard->GetTrigger(DIK_UP))
-	{
-		m_nPalam++;
-	}
-	else if(pInputKeyboard->GetTrigger(DIK_DOWN))
-	{
-		m_nPalam--;
-	}
+	
 	m_nPalam %= NUM_UI_System_Message;
 	if (m_nPalam < 0)
 	{

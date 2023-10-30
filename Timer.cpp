@@ -7,7 +7,7 @@
 //インクルード
 #include "Timer.h"
 #include "object2D.h"
-
+#include "manager.h"
 
 //=============================================
 //コンストラクタ
@@ -85,10 +85,18 @@ void CTimer::Uninit(void)
 //=============================================
 void CTimer::Update(void)
 {
-	m_fdata -= 1.666667f;
+	if (CManager::GetInstance()->GetStageCount() % 2 == 1)
+	{
+		m_fdata -= 1.666667f;
+	}
 	if (m_fdata < 0.0f)
 	{
 		m_fdata = 0.0f;
+		for (int i = 0; i < NUM_NUMBER; i++)
+		{
+			m_apNumber[i]->Get2D()->SetCol(D3DXCOLOR(1.0, 0.0f, 0.0f, 1.0f));
+
+		}
 	}
 	int nData = (int)m_fdata;
 

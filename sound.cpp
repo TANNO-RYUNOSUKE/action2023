@@ -26,6 +26,8 @@ SOUNDINFO g_aSoundInfo[CSound::SOUND_LABEL_MAX] =
 {
 	{"data/BGM/Deep_sea.wav", -1},		// BGM0
 	{"data/BGM/Deep_forest.wav", -1},		// BGM1
+	{ "data/BGM/noize.wav", -1 },		// BGM1
+	{ "data/BGM/atmosphere.wav", -1 },		// BGM1
 	{"data/SE/shot.wav", 0},			// ’e”­ŽË‰¹
 	{"data/SE/explosion.wav", 0},	// ”š”­‰¹
 	{ "data/SE/missile.wav", 0 },	

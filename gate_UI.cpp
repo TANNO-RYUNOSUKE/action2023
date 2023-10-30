@@ -55,6 +55,7 @@ void CGate_UI::Update()
 	LPDIRECT3DDEVICE9 pDevice; //デバイスのポインタ
 	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	CPlayer * pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
+	CInputGamePad * pInputGamePad = CManager::GetInstance()->GetInputGamePad();
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	if (pPlayer != NULL)
 	{
@@ -82,25 +83,27 @@ void CGate_UI::Update()
 		SetTexMax(D3DXVECTOR2(1.0f, 0.5f));
 	}
 	CBillboard::Update();
-
-	if (nEnemy <= 0)
+	if (pPlayer != NULL)
 	{
-		if (CManager::GetInstance()->GetDistance(pPlayer->GetPos() - GetPos()) < 250.0f)
+		if (nEnemy <= 0)
 		{
-			if (pInputKeyboard->GetTrigger(DIK_W))
+			if (CManager::GetInstance()->GetDistance(pPlayer->GetPos() - GetPos()) < 250.0f)
 			{
-				Release();
-				CManager::GetInstance()->SetStageCount(CManager::GetInstance()->GetStageCount() + 1);
-				if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+				if (pInputKeyboard->GetTrigger(DIK_W) || pInputGamePad->GetStickL(0,0.1f).y < -0.8f)
 				{
-					int nRand = rand() % 4;
-					CMap::Load(c_apMapPath[nRand], pPlayer);
+					Release();
+					CManager::GetInstance()->SetStageCount(CManager::GetInstance()->GetStageCount() + 1);
+					if (CManager::GetInstance()->GetStageCount() % 2 != 0)
+					{
+						int nRand = rand() % 4;
+						CMap::Load(c_apMapPath[nRand], pPlayer);
+					}
+					else
+					{
+						CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", pPlayer);
+					}
+
 				}
-				else
-				{
-					CMap::Load("data\\TEXT\\map\\map_00_Corridor.csv", pPlayer);
-				}
-			
 			}
 		}
 	}

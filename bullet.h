@@ -8,7 +8,7 @@
 #include "main.h"
 #include "billboard.h"
 #include "objectlight.h"
-
+#include "orbit.h"
 //クラス定義
 class CBullet : public CBillboard //オブジェクトクラスの継承
 {
@@ -46,6 +46,7 @@ private:
 	CEnemy ** m_pTarget;
 	static LPDIRECT3DTEXTURE9 m_pTexture;	//テクスチャへのポインタ
 	D3DXVECTOR3 m_posOld;//1フレーム前の座標
+	COrbit * m_pOrbit;
 	int m_nLife;//寿命
 	bool  m_bHoming;
 	float m_fHomingPowor;

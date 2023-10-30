@@ -95,12 +95,15 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
 				if (rand()%10 == 0)
 				{
-					if (nCnt < nMax)
+					if (CManager::GetInstance()->GetStageCount() % 2 != 0)
 					{
-						pos.y += 100.0f;
-						pos.x += 240.0f;
-						CEnemy_Walker::Create(pos, 30);
-						nCnt++;
+						if (nCnt < nMax)
+						{
+							pos.y += 100.0f;
+							pos.x += 240.0f;
+							CEnemy_Walker::Create(pos, 30);
+							nCnt++;
+						}
 					}
 				}
 				break;
@@ -111,7 +114,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				{
 					if (nCnt < nMax)
 					{
-						if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+						if (CManager::GetInstance()->GetStageCount() % 2 != 0)
 						{
 							pos.y += 100.0f;
 							pos.x += 240.0f;
@@ -128,7 +131,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				{
 					if (nCnt < nMax)
 					{
-						if (CManager::GetInstance()->GetStageCount() % 2 == 0)
+						if (CManager::GetInstance()->GetStageCount() % 2 != 0)
 						{
 							pos.y += 100.0f;
 							pos.x += 240.0f;
@@ -165,6 +168,13 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				pos.x += 240.0f;
 				
 				CGate_UI::Create(pos);
+				break;
+			case 8://âÒïúÉuÉçÉbÉN
+				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
+				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
+				CObjectX::Create("data\\MODEL\\fastAid.x", pos);
+			
 				break;
 			default:
 				assert(false);

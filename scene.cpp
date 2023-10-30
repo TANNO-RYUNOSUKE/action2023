@@ -24,6 +24,7 @@
 #include "enemy.h"
 
 #include "map.h"
+#include "pause.h"
 
 CFade * CScene::m_pFade = NULL;
 //=============================================
@@ -99,9 +100,9 @@ HRESULT CTitle::Init()
 	m_pPlayer = CPlayer::Create();
 	for (int i = 0; i < 3; i++)
 	{
-		CObjectX::Create("data\\MODEL\\corridor_ceiling.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
-		CObjectX::Create("data\\MODEL\\corridor_wall.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
-		CObjectX::Create("data\\MODEL\\corridor_floor.x", D3DXVECTOR3(-700.0f + 500.0f * i, -10.0f, 0.0f));
+		CObjectX::Create("data\\MODEL\\corridor_ceiling.x", D3DXVECTOR3(-700.0f + 550.0f * i, -10.0f, 0.0f));
+		CObjectX::Create("data\\MODEL\\corridor_wall.x", D3DXVECTOR3(-700.0f + 550.0f * i, -10.0f, 0.0f));
+		CObjectX::Create("data\\MODEL\\corridor_floor.x", D3DXVECTOR3(-700.0f + 550.0f * i, -10.0f, 0.0f));
 	}
 	m_posDest = { -100.0f,150.0f, -250.0f };
 	D3DXVECTOR3 pos ={-100.0f,100.0f,0.0f};
@@ -120,6 +121,8 @@ HRESULT CTitle::Init()
 	CSound * pSound = CManager::GetInstance()->GetSound();
 
 	pSound->Play(CSound::SOUND_LABEL_BGM000);
+	pSound->Play(CSound::SOUND_LABEL_BGM_ATMOSPHERE);
+
 	return S_OK;
 }
 //=============================================
@@ -270,6 +273,7 @@ HRESULT CGame::Init()
 	m_pLight = DBG_NEW CLight;
 	m_pPlayer = CPlayer::Create();
 	m_pTimer = m_pTimer->Create();
+	m_pPause = CPause::Create();
 	CManager::GetInstance()->SetStageCount(1);
 	CEnemy_Walker::Create(D3DXVECTOR3(6000.0f, -2500.0f, 0.0f), 10);
 	CMap::Load("data\\TEXT\\map\\map_01_Rooms.csv", m_pPlayer);
@@ -288,7 +292,8 @@ HRESULT CGame::Init()
 
 
 	CSound * pSound = CManager::GetInstance()->GetSound();
-	pSound->Play(CSound::SOUND_LABEL_BGM001);
+//	pSound->Play(CSound::SOUND_LABEL_BGM001);
+	pSound->Play(CSound::SOUND_LABEL_BGM_ATMOSPHERE);
 
 
 	return S_OK;
@@ -336,11 +341,14 @@ void CGame::Update()
 {
 	CDebugProc * pDeb = CManager::GetInstance()->GetDeb();
 	m_nCnt++;
-	m_pTimer->Update();
+	if (!CManager::GetInstance()->GetPause())
+	{
+		m_pTimer->Update();
+	}
 	m_pUI->Update();
 	m_pCamera->Update();
 	m_pLight->Update();
-
+	m_pPause->Update();
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	if (pInputKeyboard->GetTrigger(DIK_P) || pInputGamepad->GetTrigger(CInputGamePad::Button_START,0))
@@ -422,7 +430,13 @@ HRESULT CResult::Init()
 {
 	m_pFade = DBG_NEW CFade;
 	m_pFade->Init();
-	
+	for (int nCnt = 0; nCnt < 2; nCnt++)
+	{
+		m_apNumber[nCnt] = CNumber::Create();
+		
+		m_apNumber[nCnt]->Set(D3DXVECTOR3(SCREEN_WIDTH * 0.75f + 75.0f*nCnt, SCREEN_HEIGHT * 0.45f, 0), D3DXVECTOR3(0.0f, 0.0f, 0.0f), 150.0f, 75.0f);
+		
+	}
 	CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, SCREEN_WIDTH, 0, "data\\TEXTURE\\Ranking.png");
 	return S_OK;
 }
@@ -431,14 +445,30 @@ HRESULT CResult::Init()
 //=============================================
 void CResult::Uninit()
 {
-	
+	for (int i = 0; i < 2; i++)
+	{
+		if (m_apNumber[i] != NULL)
+		{
+			delete m_apNumber[i];
+			m_apNumber[i] = NULL;
+		}
+		
+	}
 }
 //=============================================
 //XVŠÖ”
 //=============================================
 void CResult::Update()
 {
-
+	int nData = CManager::GetInstance()->GetStageCount();
+	nData /=2;
+	nData++;
+	m_apNumber[0]->Setdata(nData % 100 / 10);
+	m_apNumber[1]->Setdata(nData % 10 / 1);
+	for (int nCnt = 0; nCnt < 2; nCnt++)
+	{
+		m_apNumber[nCnt]->Update();
+	}
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	if (pInputKeyboard->GetTrigger(DIK_RETURN)|| pInputGamepad->GetTrigger(CInputGamePad::Button_START, 0))

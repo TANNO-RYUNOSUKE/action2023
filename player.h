@@ -12,7 +12,7 @@
 #include "object2D.h"
 #include "objectlight.h"
 #include "ui_system_message.h"
-
+#include "billboard.h"
 
 //マクロ定義
 #define GRAVITY (0.4f)
@@ -43,9 +43,8 @@ public:
 		LOWERMOTION_WALK,
 		LOWERMOTION_FLIP,
 		LOWERMOTION_JUMP,
-		LOWERMOTION_ATTACK1,
-		LOWERMOTION_ATTACK2,
-		LOWERMOTION_ATTACK3,
+		LOWERMOTION_DAMAGE,
+		LOWERMOTION_DEATH,
 		LOWERMOTION_MAX
 	}LOWERMOTION;
 
@@ -55,6 +54,8 @@ public:
 		STATE_NEUTRAL,
 		STATE_DASH,
 		STATE_HOVER,
+		STATE_DAMAGE,
+		STATE_DEATH,
 		STATE_MAX
 	}STATE;
 
@@ -77,12 +78,18 @@ public:
 	static float PlusMin(float a, float b);
 	CModel * GetModelUp(int nData = 0) { return m_apModel[nData]; }
 	void SetState(STATE state, int nCnt) { m_state = state; m_nStateCount = nCnt; }
-	
+	STATE GetState() { return m_state; }
+	void SetFilterDisp(int nCnt) { m_nFilter = nCnt; }
+	void SetInvincivl(int nCnt) { m_nCntInvincivl = nCnt; }
+	int GetInvincivl() { return m_nCntInvincivl; }
+	CMotion * GetMotion() { return m_pMotionUp; }
 private:
 	STATE m_state;
+	int m_nFilter;
 	int m_nStateCount;
 	CObject2D * m_pFilterDamage;
 	int m_nLife;//体力
+	int m_nReload;
 	CMotion * m_pMotionUp;//モーションポインタ
 	CEnemy ** m_pTarget;
 	D3DXVECTOR3 m_posOld;//1フレーム前の座標
@@ -92,8 +99,8 @@ private:
 	int m_nNumModel;//使用するモデルの数
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 	CObjectLight * m_pLight;
-
-	
+	CBillboard * m_apTargetUI[2];
+	int m_nCntInvincivl;
 };
 
 #endif // ! _PLAYER_H_

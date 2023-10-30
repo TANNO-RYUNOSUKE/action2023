@@ -132,6 +132,12 @@
     <ClInclude Include="gate_UI.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="fake_bluescreen.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="pause.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -234,6 +240,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="gate_UI.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="fake_bluescreen.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="pause.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
