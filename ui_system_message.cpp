@@ -4,6 +4,7 @@
 #include "UI_System_Message.h"
 #include "renderer.h"
 #include "manager.h"
+#include "player.h"
 #include "input.h"
 //====================================
 //コンストラクタ、デストラクタ
@@ -53,6 +54,7 @@ void CUI_System_Message::Uninit(void)
 //====================================
 void CUI_System_Message::Update(void)
 {
+	CPlayer * pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
 	m_nCnt++;
 	for (int i = 0; i < NUM_UI_System_Message; i++)
 	{
@@ -74,7 +76,11 @@ void CUI_System_Message::Update(void)
 	}
 
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
-	
+	if (pPlayer != NULL)
+	{
+		m_nPalam = 4 - pPlayer->GetLife();
+			
+	}
 	m_nPalam %= NUM_UI_System_Message;
 	if (m_nPalam < 0)
 	{

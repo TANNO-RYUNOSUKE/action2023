@@ -183,7 +183,7 @@ void CTitle::Update()
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	
-	if (pInputKeyboard->GetTrigger(DIK_RETURN)|| pInputGamepad->GetTrigger(CInputGamePad::Button_START,0))
+	if (pInputKeyboard->GetTrigger(DIK_RETURN)|| pInputGamepad->GetTrigger(CInputGamePad::Button_START,0) || pInputGamepad->GetTrigger(CInputGamePad::Button_A, 0))
 	{
 		m_pFade->FadeOut(MODE::MODE_GAME);
 	}
@@ -288,13 +288,16 @@ HRESULT CGame::Init()
 		return -1;
 	};
 
-	
+	for (int i = 0; i < 3; i++)
+	{
+		m_pGage[i] = CObject2D::Create(D3DXVECTOR3((SCREEN_WIDTH * 0.1f) + (50.0f*i), SCREEN_HEIGHT *0.9f, 0.0f), 45.0f, 20.0f);
+	}
 
 
 	CSound * pSound = CManager::GetInstance()->GetSound();
 //	pSound->Play(CSound::SOUND_LABEL_BGM001);
 	pSound->Play(CSound::SOUND_LABEL_BGM_ATMOSPHERE);
-
+	pSound->Play(CSound::SOUND_LABEL_BGM000);
 
 	return S_OK;
 	return S_OK;
@@ -349,6 +352,24 @@ void CGame::Update()
 	m_pCamera->Update();
 	m_pLight->Update();
 	m_pPause->Update();
+	if (m_pPlayer != NULL)
+	{
+		float fEnergy = m_pPlayer->GetEnergy();
+		for (int i = 0; i < 3; i++)
+		{
+			float fLeng = 0.0f;
+			fLeng = 1.0f;
+			fEnergy -= 1.0f;
+			if (fEnergy < 0)
+			{
+				fLeng += fEnergy;
+				fEnergy = 0.0f;
+			}
+			m_pGage[i]->SetHeight(45.0f * (fLeng));
+		}
+	}
+	
+
 	CInputKeyboard * pInputKeyboard = CManager::GetInstance()->GetInputKeyboard();
 	CInputGamePad * pInputGamepad = CManager::GetInstance()->GetInputGamePad();
 	if (pInputKeyboard->GetTrigger(DIK_P) || pInputGamepad->GetTrigger(CInputGamePad::Button_START,0))
@@ -363,7 +384,7 @@ void CGame::Update()
 		}
 	}
 	float fTime = m_pTimer->GetTimer();
-	if (pInputKeyboard->GetTrigger(DIK_RETURN) || pInputGamepad->GetTrigger(CInputGamePad::Button_START, 0) || fTime == 0.0f)
+	if (fTime == 0.0f)
 	{
 		m_pFade->FadeOut(MODE::MODE_RESULT);
 	}

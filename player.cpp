@@ -17,6 +17,7 @@
 #include "camera.h"
 #include "bullet.h"
 #include <stdio.h>
+#include "fade.h"
 
 #include "scene.h"
 #include "sound.h"
@@ -65,12 +66,13 @@ CPlayer::~CPlayer()
 //=============================================
 HRESULT CPlayer::Init()
 {
+	m_fEnergy = ENERGY_MAX;
 	m_nCntInvincivl = 0;
 	m_pTarget = NULL;
 	m_pFilterDamage = CObject2D::Create(D3DXVECTOR3(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0.0f), SCREEN_HEIGHT, SCREEN_WIDTH, 6, "data\\TEXTURE\\RedFilter.png");
 	m_pFilterDamage->SetDisp(false);
 	m_nFilter = 0;
-	m_nLife = 10;
+	m_nLife = 5;
 
 	m_apTargetUI[0] = CBillboard::Create(60.0f, 60.0f,GetPos(), "data\\TEXTURE\\UI\\target2.png");
 	m_apTargetUI[1] = CBillboard::Create(60.0f, 60.0f, GetPos(), "data\\TEXTURE\\UI\\target1.png");
@@ -78,6 +80,7 @@ HRESULT CPlayer::Init()
 	{
 		m_apTargetUI[i]->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 	}
+
 	m_pMotionUp = DBG_NEW CMotion;
 	m_pMotionUp->SetModel(&m_apModel[0]);
 
@@ -119,6 +122,18 @@ void CPlayer::Uninit()
 //=============================================
 void CPlayer::Update()
 {
+	m_fEnergy += 0.01f;
+	if (m_bLand == true)
+	{
+		m_fEnergy += 0.1f;
+	}
+	if (m_fEnergy >= ENERGY_MAX)
+	{
+		m_fEnergy = ENERGY_MAX;
+	}
+	
+	
+
 	m_nFilter--;
 	m_nCntInvincivl--;
 	m_nReload--;
@@ -217,7 +232,7 @@ void CPlayer::Update()
 				m_apTargetUI[i]->SetPos(pCamera->GetPosV());
 			}
 		}
-		if ((pInputKeyboard->GetPress(DIK_LSHIFT) || pInputGamePad->GetTrigger(CInputGamePad::Button_RB,0))&& m_nReload <= 0)
+		if ((pInputKeyboard->GetPress(DIK_RETURN) || pInputGamePad->GetPress(CInputGamePad::Button_RB,0))&& m_nReload <= 0)
 		{
 			m_nReload = 6;
 			D3DXVECTOR3 pos = D3DXVECTOR3(m_apModel[13]->GetMatrix()._41, m_apModel[13]->GetMatrix()._42, m_apModel[13]->GetMatrix()._43);
@@ -230,7 +245,7 @@ void CPlayer::Update()
 					
 					for (int i = 0; i < 8; i++)
 					{
-						m_nReload = 50;
+						m_nReload = 30;
 						CBullet::Create(pos, -vec * 50.0f, 300, CBullet::TYPE_PLAYER, false, m_pTarget);
 					}
 					
@@ -269,8 +284,8 @@ void CPlayer::Update()
 				break;
 			case CPlayer::STATE_DEATH:
 				CManager::GetInstance()->GetScene()->SetPlayer(NULL);
-				CFake_BlueScreen::Create();
-				Release();
+				CGame::GetFade()->FadeOut(CGame::MODE_RESULT);
+			
 
 				return;
 				break;
@@ -497,7 +512,7 @@ void CPlayer::Move()
 				m_bLand = false;
 			}
 		}
-		if (pInputKeyboard->GetTrigger(DIK_SPACE) || pInputGamePad->GetTrigger(CInputGamePad::Button_X,0) )
+		if ((pInputKeyboard->GetTrigger(DIK_SPACE) || pInputGamePad->GetTrigger(CInputGamePad::Button_X,0)) && m_fEnergy >= 1.0f)
 		{
 			D3DXVECTOR3 vec{ 0.0f,0.0f, 0.0f };
 			if (pInputKeyboard->GetPress(DIK_W))
@@ -532,6 +547,7 @@ void CPlayer::Move()
 				D3DXVec3Normalize(&vec, &vec);
 				move = vec * DASH_PLAYER;
 				SetState(STATE_DASH, 30);
+				m_fEnergy -= 1.0f;
 			}
 		}
 	

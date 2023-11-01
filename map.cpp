@@ -5,6 +5,7 @@
 #include "Xmanager.h"
 #include"enemy.h"
 #include "objectX.h"
+#include "UI_first_aid.h"
 #include <stdio.h>
 #include <assert.h>
 //====================================-----
@@ -93,7 +94,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
-				if (rand()%10 == 0)
+				if (rand()% 5 == 0)
 				{
 					if (CManager::GetInstance()->GetStageCount() % 2 != 0)
 					{
@@ -110,7 +111,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 			case 3://è„ãÛÇ´
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
-				if (rand() % 10 == 0)
+				if (rand() % 5 == 0)
 				{
 					if (nCnt < nMax)
 					{
@@ -118,7 +119,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 						{
 							pos.y += 100.0f;
 							pos.x += 240.0f;
-							CEnemy_Walker::Create(pos, 10);
+							CEnemy_Walker::Create(pos, 30);
 							nCnt++;
 						}
 					}
@@ -127,7 +128,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 			case 4://â∫ãÛÇ´
 				CObjectX::Create("data\\MODEL\\corridor_ceiling.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
-				if (rand() % 10 == 0)
+				if (rand() % 5 == 0)
 				{
 					if (nCnt < nMax)
 					{
@@ -135,7 +136,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 						{
 							pos.y += 100.0f;
 							pos.x += 240.0f;
-							CEnemy_Walker::Create(pos, 10);
+							CEnemy_Drone::Create(pos, 15);
 							nCnt++;
 						}
 					}
@@ -143,7 +144,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				break;
 			case 5://êÅÇ´î≤ÇØ
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
-				if (rand() % 10 == 0)
+				if (rand() % 5 == 0)
 				{
 					if (nCnt < nMax)
 					{
@@ -151,7 +152,7 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 						{
 							pos.y += 100.0f;
 							pos.x += 240.0f;
-							CEnemy_Walker::Create(pos, 10);
+							CEnemy_Drone::Create(pos, 20);
 							nCnt++;
 						}
 					}
@@ -174,7 +175,9 @@ HRESULT CMap::Load(char * path, CPlayer * pPlayer)
 				CObjectX::Create("data\\MODEL\\corridor_wall.x", pos);
 				CObjectX::Create("data\\MODEL\\corridor_floor.x", pos);
 				CObjectX::Create("data\\MODEL\\fastAid.x", pos);
-			
+				pos.y += 150.0f;
+				pos.x += 240.0f;
+				CUI_first_aid::Create(pos);
 				break;
 			default:
 				assert(false);

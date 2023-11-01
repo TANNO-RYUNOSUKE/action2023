@@ -65,6 +65,7 @@ public:
 	virtual CPlayer * GetPlayer(void) { return NULL; }
 	virtual CCamera * GetCamera(void) { return NULL; }
 	virtual void SetPlayer(CPlayer * pPlayer) { ; }
+	virtual CTimer * GetTimer(void) { return NULL; }
 private:
 	MODE m_Mode;
 
@@ -140,9 +141,10 @@ public:
 
 	 CCamera * GetCamera(void) { return m_pCamera; }
 
-
+	 CTimer * GetTimer(void) { return m_pTimer; }
 	 void SetPlayer(CPlayer * pPlayer) { m_pPlayer = pPlayer; }
 private:
+	CObject2D * m_pGage[3];
 	CPause * m_pPause;
 	 CPlayer * m_pPlayer;//プレイヤーのポインタ
 	 CUI_System_Message * m_pUI;

@@ -170,6 +170,7 @@
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="UI_first_aid.h" />
     <ClInclude Include="ui_system_message.h" />
     <ClInclude Include="xfile.h" />
     <ClInclude Include="Xmanager.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="UI_first_aid.cpp" />
     <ClCompile Include="ui_system_message.cpp" />
     <ClCompile Include="xfile.cpp" />
     <ClCompile Include="Xmanager.cpp" />

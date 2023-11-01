@@ -8,9 +8,9 @@
 #include "main.h"
 #include "object.h"
 #include "model.h"
-
+#include "objectlight.h"
 #include "motion.h"
-
+#include "billboard.h"
 
 class CHitBox //ヒットボックス
 {
@@ -86,7 +86,7 @@ protected:
 	int m_nStateCount;
 
 	int m_nLife; //体力
-
+	CBillboard * m_pPointMark;
 	D3DXVECTOR3 m_posDest;
 	D3DXVECTOR3 m_rotDest;
 	CMotion * m_pMotion;//モーションポインタ
@@ -94,10 +94,8 @@ protected:
 	CHitBox * pHitBox;
 
 private:
-
 	//CModel * m_pModel;//モデルのポインタ
-	
-
+	CObjectLight * m_pLight;
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 
 	int m_nID;//ID
@@ -125,6 +123,25 @@ private:
 	MOVE m_Move;
 
 };
+//エネミー(drone)
+class CEnemy_Drone : public CEnemy
+{
+public:
+	CEnemy_Drone();
+	~CEnemy_Drone();
 
+	HRESULT Init(void);
+	void Uninit(void);
+	void Update(void);
+	void Draw(void);
+	static CEnemy_Drone * Create(D3DXVECTOR3 pos, int nLife);
+private:
+	float m_fRot;
+	float m_fLength;
+	int m_nHeat;
+	int m_nMaxHeat;
+	int m_nCount;
+	bool m_bOverHeat;
+};
 
 #endif // ! _ENEMY_H_

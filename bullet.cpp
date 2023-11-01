@@ -62,8 +62,16 @@ HRESULT CBullet::Init()
 	CTexture * pTex = CManager::GetInstance()->GetTexture();
 	
 	m_nIdxTex[0] = pTex->Regist("data\\TEXTURE\\Bullet000.png");
-	m_pOrbit = COrbit::Create(20.0f, 128, D3DXCOLOR(1.5f, 1.5f, 1.5f
-		, 1.0f), GetPos());
+	switch (m_Type)
+	{
+	case CBullet::TYPE_ENEMY:
+		m_pOrbit = COrbit::Create(20.0f, 128, D3DXCOLOR(1.0f, 0.5f, 1.0f, 1.0f), GetPos());
+		break;
+	default:
+		m_pOrbit = COrbit::Create(20.0f, 128, D3DXCOLOR(1.5f, 1.5f, 1.5f, 1.0f), GetPos());
+		break;
+	}
+	
 	D3DXVECTOR3 pos1, pos2;
 	pos1 = GetPos(); pos2 = GetPos();
 	pos1.y += 10.0f;
@@ -80,7 +88,7 @@ HRESULT CBullet::Init()
 //=============================================
 void CBullet::Uninit()
 {
-	
+	m_pOrbit->end();
 	CBillboard::Uninit();
 	
 }
@@ -116,7 +124,7 @@ void CBullet::Update()
 	case CBullet::TYPE_ENEMY:
 		pos1.y += 10.0f;
 		pos2.y -= 10.0f;
-	
+		m_pOrbit->SetOffset(pos1, pos2);
 		if (m_bHoming == true)
 		{
 			Homing(m_fHomingPowor);
@@ -162,8 +170,8 @@ void CBullet::Update()
 		}
 		else
 		{
-			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 60, 60.0f, 30, 10, 1.01f);
-			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 60, 360.0f, 300, 2);
+			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 60, 30.0f, 15, 10, 1.01f);
+			CParticle::Create(CBullet::GetPos(), D3DXCOLOR(0.3f, 0.6f, 1.0f, 1.0f), 1, 60, 180.0f, 150, 2);
 
 		}
 
@@ -314,18 +322,27 @@ bool CBullet::CollisionPlayer(D3DXVECTOR3 pos)
 			CModel * pModel = pPlayer->GetModelUp();
 
 
-			D3DXVECTOR3 max = pModel->GetMax() + pPlayer->GetPos();
-			D3DXVECTOR3 min = pModel->GetMin() + pPlayer->GetPos();
+			D3DXVECTOR3 max = pModel->GetMax() + pPlayer->GetPos() +D3DXVECTOR3(20.0f,20.0f,20.0f);
+			D3DXVECTOR3 min = pModel->GetMin() + pPlayer->GetPos() - D3DXVECTOR3(20.0f, 20.0f, 20.0f);
 
-			if (pos.x <= max.x && pos.y <= max.y && pos.z <= max.z)
+			if (pos.x <= max.x && pos.y <= max.y)
 			{
-				if (pos.x >= min.x && pos.y >= min.y && pos.z >= min.z)
+				if (pos.x >= min.x && pos.y >= min.y )
 				{
 				
 					m_nLife = 0;
-					if (pPlayer->GetInvincivl() <= 0)
+					if (pPlayer->GetInvincivl() <= 0 && pPlayer->GetState()!= CPlayer::STATE_DEATH &&pPlayer->GetState() != CPlayer::STATE_DASH)
 					{
 						pPlayer->AddLife(-1);
+						pPlayer->GetMotion()->SetType(CPlayer::LOWERMOTION_DAMAGE);
+						pPlayer->SetState(CPlayer::STATE_DAMAGE, 15);
+						D3DXVECTOR3 vec = pos - GetPos();
+						vec.y = 0.0f;
+						vec.z = 0.0f;
+						D3DXVec3Normalize(&vec, &vec);
+						pPlayer->SetMove(pPlayer->GetMove() + vec * 50.0f);
+						pPlayer->SetInvincivl(120);
+						pPlayer->SetFilterDisp(6);
 					}
 				
 					return true;

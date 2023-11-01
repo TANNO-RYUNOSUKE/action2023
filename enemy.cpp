@@ -92,6 +92,9 @@ HRESULT CEnemy::Init()
 	m_pMotion = DBG_NEW  CMotion;
 	m_pMotion->SetModel(&m_apModel[0]);
 	SetType(CObject::TYPE_ENEMY);
+	m_pPointMark = m_pPointMark->Create(10.0f, 10.0f, GetPos(), "data\\TEXTURE\\Enemymark.png");
+
+
 
 	return S_OK;
 }
@@ -100,6 +103,7 @@ HRESULT CEnemy::Init()
 //=============================================
 void CEnemy::Uninit()
 {
+	
 	if (pHitBox != NULL)
 	{
 		delete pHitBox;
@@ -110,6 +114,7 @@ void CEnemy::Uninit()
 		delete m_pMotion;
 		m_pMotion = NULL;
 	}
+	
 	for (int nCnt = 0; nCnt < NUM_MODEL; nCnt++)
 	{
 		if (m_apModel[nCnt] != NULL)
@@ -127,7 +132,8 @@ void CEnemy::Uninit()
 //=============================================
 void CEnemy::Update()
 {
-	
+	m_pPointMark->SetPos(D3DXVECTOR3(GetPos().x, GetPos().y + 150.0f, GetPos().z));
+
 	if (m_apModel[0] != NULL)
 	{
 		pHitBox->SetPos(GetPos() + m_apModel[0]->GetPos());
@@ -221,7 +227,10 @@ void CEnemy::Update()
 					}
 
 				}
-		
+				if (m_pPointMark != NULL)
+				{
+					m_pPointMark->Release();
+				}
 				Release();
 				return;
 			break;
@@ -441,6 +450,130 @@ CEnemy_Walker * CEnemy_Walker::Create(D3DXVECTOR3 pos, int nLife)
 
 	CEnemy_Walker * pEnemy = NULL;
 	pEnemy = DBG_NEW  CEnemy_Walker;
+
+	pEnemy->SetPos(pos);
+	pEnemy->m_nLife = nLife;
+	pEnemy->Init();
+	if (pEnemy->GetID() < 0)
+	{
+		pEnemy->Release();
+		return NULL;
+	}
+	return pEnemy;
+}
+
+CEnemy_Drone::CEnemy_Drone() :CEnemy()
+{
+
+}
+
+CEnemy_Drone::~CEnemy_Drone()
+{
+}
+
+//=============================================
+//èâä˙âªä÷êî
+//=============================================
+HRESULT CEnemy_Drone::Init()
+{
+	CEnemy::Init();
+	delete m_pMotion;
+	m_pMotion = NULL;
+	m_nCount = 0;
+	m_nHeat = 0;
+	m_bOverHeat = false;
+	m_nHeat = 180;
+	m_nMaxHeat = rand() % 1000 + 100;
+	m_apModel[0] = m_apModel[0]->Create("data\\MODEL\\probe.x");
+	pHitBox = CHitBox::Create(m_apModel[0]->GetMax(), m_apModel[0]->GetMin(), m_apModel[0]->GetPos() + GetPos());
+	m_fRot = rand() % 628 - 314 * 0.01f;
+	m_fLength = rand() % 1000000 * 0.1f + 200.0f;
+	m_posDest = {};
+	return S_OK;
+}
+//=============================================
+//èIóπä÷êî
+//=============================================
+void CEnemy_Drone::Uninit()
+{
+
+	CEnemy::Uninit();
+
+}
+//=============================================
+//çXêVä÷êî
+//=============================================
+void CEnemy_Drone::Update()
+{
+
+	m_nHeat--;
+	if (m_nHeat <= 0)
+	{
+		m_nHeat = 0;
+	}
+	CPlayer * pPlayer = NULL;
+	pPlayer = CManager::GetInstance()->GetScene()->GetPlayer();
+	if (m_State != STATE_DEAD)
+	{
+		if (pPlayer != NULL)
+		{
+			m_posDest.x = pPlayer->GetPos().x;
+			m_posDest.y = pPlayer->GetPos().y;
+			m_posDest.y += 100.0f;
+			D3DXVECTOR3 vecplayer = GetMove();
+		
+		
+			m_rotDest = D3DXVECTOR3(0.0f, atan2f(vecplayer.x, vecplayer.z), 0.0f);
+		
+		
+
+			
+		}
+	}
+	if (m_nHeat <= 0)
+	{
+		if (pPlayer != NULL)
+		{
+			D3DXVECTOR3 vecplayer;
+			vecplayer = CPlayer::LinePrediction(GetPos(), (pPlayer->GetModelUp()->GetPos() + pPlayer->GetPos()), (pPlayer->GetModelUp()->GetPos() + pPlayer->GetPosOld()), 30.0f) - GetPos();
+			D3DXVec3Normalize(&vecplayer, &vecplayer);
+			CBullet::Create(GetPos(), vecplayer * 10.0f, 150, CBullet::TYPE_ENEMY, true);;
+			m_nHeat += 120;
+		}
+	
+	}
+
+	D3DXVECTOR3 vec = m_posDest - GetPos();
+	D3DXVec3Normalize(&vec, &vec);
+	SetMove(GetMove() + vec * 0.25f);
+
+	D3DXVECTOR3 move = GetMove();
+	move.x *= 0.99f;//å¥ë•åWêî
+	move.y *= 0.99f;//å¥ë•åWêî
+	move.z *= 0.99f;//å¥ë•åWêî
+
+
+	SetMove(move);
+	CEnemy::Update();
+}
+
+//=============================================
+//ï`âÊä÷êî
+//=============================================
+void CEnemy_Drone::Draw()
+{
+	CEnemy::Draw();
+}
+
+
+//=============================================
+//ê∂ê¨ä÷êî
+//=============================================
+CEnemy_Drone * CEnemy_Drone::Create(D3DXVECTOR3 pos, int nLife)
+{
+
+	CEnemy_Drone * pEnemy = NULL;
+	pEnemy = DBG_NEW  CEnemy_Drone;
 
 	pEnemy->SetPos(pos);
 	pEnemy->m_nLife = nLife;

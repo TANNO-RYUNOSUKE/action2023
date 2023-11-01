@@ -16,7 +16,7 @@
 
 //マクロ定義
 #define GRAVITY (0.4f)
-
+#define ENERGY_MAX (3.0f)
 //クラス定義
 class CPlayer : public CObject //オブジェクトクラスの継承
 {
@@ -83,6 +83,7 @@ public:
 	void SetInvincivl(int nCnt) { m_nCntInvincivl = nCnt; }
 	int GetInvincivl() { return m_nCntInvincivl; }
 	CMotion * GetMotion() { return m_pMotionUp; }
+	float GetEnergy() { return m_fEnergy; }
 private:
 	STATE m_state;
 	int m_nFilter;
@@ -100,7 +101,9 @@ private:
 	D3DXMATRIX m_mtxWorld; //ワールドマトリックス
 	CObjectLight * m_pLight;
 	CBillboard * m_apTargetUI[2];
+	CObject2D * m_pGage[3];
 	int m_nCntInvincivl;
+	float m_fEnergy;
 };
 
 #endif // ! _PLAYER_H_

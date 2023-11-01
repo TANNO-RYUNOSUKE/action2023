@@ -97,7 +97,7 @@ CBillboard * CBillboard::Create(float fHeight, float fWidth, D3DXVECTOR3 pos, ch
 {
 	CBillboard * pObject3D = NULL;
 
-	pObject3D = DBG_NEW CBillboard;
+	pObject3D = DBG_NEW CBillboard(6);
 	if (pName != NULL)
 	{
 		CTexture * pTex = CManager::GetInstance()->GetTexture();
@@ -206,6 +206,14 @@ void CBillboard::Draw(void)
 	m_mtxWorld._41 = 0.0f;
 	m_mtxWorld._42 = 0.0f;
 	m_mtxWorld._43 = 0.0f;
+
+
+	// ワールドマトリクスに回転行列を適用
+	D3DXMATRIX mtxRotation;
+	D3DXMatrixRotationZ(&mtxRotation, GetRot().z); // Z軸周りに回転
+
+	// ワールドマトリクスに位置変換行列も適用
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRotation);
 
 	//位置を反映
 	D3DXMatrixTranslation(&mtxTrans, pos.x, pos.y,pos.z);
